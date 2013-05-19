@@ -1,0 +1,36 @@
+:title タグてすと
+:author Tagrus Adams
+:date 2013-05-19
+
+:memo[
+-メモです
+-こういう
+-要素を
+-いれるぞ
+:memo]
+
+:body[
+うんこ小説
+:body]
+
+:test[
+ほげ
+ふが
+:test]
+
+:error]
+どうなる１
+:error[
+どうなる２
+:error]
+どうなる３
+
+:nest1[
+ねすと１
+:nest2[
+ねすと２
+:nest2]
+ネスト１
+:nest1]
+
+
