@@ -20,10 +20,17 @@
 (defconstant +tag-block-delimiter-start+ #\[)
 (defconstant +tag-block-delimiter-end+ #\])
 
-(defconstant +tag-regex-oneline+ ":(.+?)[ ]+(.+)$")
+(defconstant +tag-identifer-valid-chars+ "[a-z0-9-]"
+(defconstant +tag-regex-oneline+ 
+  (concatenate 'string
+			   ":("
+			   +tag-identifer-valid-chars+
+			   "+?)[ ]+(.+)$")
 (defconstant +tag-regex-block+
   (concatenate 'string
-			   ":(.+?)(\\"
+			   ":("
+			   +tag-identifer-valid-chars+
+			   "+?)(\\"
 			   (string +tag-block-delimiter-start+)
 			   "|\\"
 			   (string +tag-block-delimiter-end+)
