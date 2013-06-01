@@ -5,16 +5,18 @@
   Copyright (c) 2013 subaru45
 |#
 
-;; (inpackage #:cl-user)
 
-;; (defpackage #:ngn
-;;   (:import-from #:cl-user)
-;;   (:import-from #:cl-ppcre)
-;;   (:export #:ngn))
-
-
+(in-package #:cl-user)
 (ql:quickload :alexandria)
 (ql:quickload :cl-ppcre)
+
+(defpackage #:ngn
+  (:import-from #:cl-user)
+  (:import-from #:alexandria)
+  (:import-from #:cl-ppcre)
+  (:export #:ngn))
+(in-package #:ngn)
+
 
 
 (defconstant +tag-block-delimiter-start+ #\[)
