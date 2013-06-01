@@ -13,6 +13,7 @@
 ;;   (:export #:ngn))
 
 
+(ql:quickload :alexandria)
 (ql:quickload :cl-ppcre)
 
 
@@ -33,13 +34,13 @@
   (car (multiple-value-list (intern (string-upcase name)
 									:keyword))))
 
-(defun empty-string-p (str)
-  (if (zerop (length str))
-	  str
-	  nil))
+;; (defun empty-string-p (str)
+;;   (if (zerop (length str))
+;; 	  str
+;; 	  nil))
 
 (defun parse-tag (line tag-regex)
-  (if (and (stringp line) (empty-string-p line))
+  (if (and (stringp line) (alexandria:emptyp line))
 	  nil
 	  (multiple-value-bind (_ tag) (cl-ppcre:scan-to-strings tag-regex line)
 		(if (null _)
@@ -49,7 +50,7 @@
 (defun parse-oneline-tags (text)
   (let ((tags))
 	(dolist (line text (reverse tags))
-	  (let ((tag (scan-tag line +tag-regex-oneline+)))
+	  (let ((tag (parse-tag line +tag-regex-oneline+)))
 		(if (not (null tag))
 			(push tag tags))))))
 
@@ -59,21 +60,21 @@
 	  (flet ((tag-p (tag delim)
 			   (and (not (null tag)) (string= (cadr tag) delim))))
 		(if (null tag-name)
-			(let ((tag (scan-tag (car text) +tag-regex-block+)))
+			(let ((tag (parse-tag (car text) +tag-regex-block+)))
 			  (if (tag-p tag +tag-block-delimiter-start+)
-				  (scan-block-tags (cdr text) (car tag))
-				  (scan-block-tags (cdr text))))
-			(let ((tag (scan-tag (car text) +tag-regex-block+)))
+				  (parse-block-tags (cdr text) (car tag))
+				  (parse-block-tags (cdr text))))
+			(let ((tag (parse-tag (car text) +tag-regex-block+)))
 			  (if (and (tag-p tag +tag-block-delimiter-end+)
 					   (eq tag-name (gen-keyword (car tag))))
 				  (cons (list tag-name lines)
-						(scan-block-tags (cdr text)))
-				  (scan-block-tags (cdr text) 
+						(parse-block-tags (cdr text)))
+				  (parse-block-tags (cdr text) 
 								   tag-name
 								   (reverse (cons (car text)
 												  (reverse lines))))))))))
 
 (defun parse-tags (text)
-  (append (scan-oneline-tags text)
-		  (scan-block-tags text)))
+  (append (parse-oneline-tags text)
+		  (parse-block-tags text)))
 
