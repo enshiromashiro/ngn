@@ -1,33 +1,29 @@
 #|
-  ngn: novel page generator
-
-  This file is a part of ngn.
+  This file is a part of ngn project.
   Copyright (c) 2013 subaru45
 |#
 
+(in-package :cl-user)
+(defpackage ngn.tag-parser
+  (:use :cl)
+  (:import-from :alexandria
+				:emptyp)
+  (:import-from :cl-ppcre
+				:scan-to-strings))
+(in-package :ngn.tag-parser)
 
-(in-package #:cl-user)
-(ql:quickload :alexandria)
-(ql:quickload :cl-ppcre)
-
-(defpackage #:ngn
-  (:import-from #:cl-user)
-  (:import-from #:alexandria)
-  (:import-from #:cl-ppcre)
-  (:export #:ngn))
-(in-package #:ngn)
-
+(cl-annot:enable-annot-syntax)
 
 
 (defconstant +tag-block-delimiter-start+ #\[)
 (defconstant +tag-block-delimiter-end+ #\])
 
-(defconstant +tag-identifer-valid-chars+ "[a-z0-9-]"
+(defconstant +tag-identifer-valid-chars+ "[a-z0-9-]")
 (defconstant +tag-regex-oneline+ 
   (concatenate 'string
 			   ":("
 			   +tag-identifer-valid-chars+
-			   "+?)[ ]+(.+)$")
+			   "+?)[ ]+(.+)$"))
 (defconstant +tag-regex-block+
   (concatenate 'string
 			   ":("
@@ -39,22 +35,10 @@
 			   ")$"))
 
 
-(defun gen-keyword (name)
-  (car (multiple-value-list (intern (string-upcase name)
-									:keyword))))
-
-;; (defun empty-string-p (str)
-;;   (if (zerop (length str))
-;; 	  str
-;; 	  nil))
-
-(defun parse-tag (line tag-regex)
-  (if (and (stringp line) (alexandria:emptyp line))
-	  nil
-	  (multiple-value-bind (_ tag) (cl-ppcre:scan-to-strings tag-regex line)
-		(if (null _)
-			nil
-			(list (gen-keyword (svref tag 0)) (svref tag 1))))))
+@export
+(defun parse-tags (text)
+  (append (parse-oneline-tags text)
+		  (parse-block-tags text)))
 
 (defun parse-oneline-tags (text)
   (let ((tags))
@@ -83,7 +67,14 @@
 								   (reverse (cons (car text)
 												  (reverse lines))))))))))
 
-(defun parse-tags (text)
-  (append (parse-oneline-tags text)
-		  (parse-block-tags text)))
+(defun parse-tag (line tag-regex)
+  (if (and (stringp line) (emptyp line))
+	  nil
+	  (multiple-value-bind (_ tag) (scan-to-strings tag-regex line)
+		(if (null _)
+			nil
+			(list (gen-keyword (svref tag 0)) (svref tag 1))))))
 
+(defun gen-keyword (name)
+  (car (multiple-value-list (intern (string-upcase name)
+									:keyword))))

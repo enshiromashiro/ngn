@@ -1,16 +1,16 @@
 #|
-  ngn: novel page generator
-
-  This file is a part of ngn.
+  This file is a part of ngn project.
   Copyright (c) 2013 subaru45
 |#
 
-;; (inpackage #:cl-user)
+(in-package :cl-user)
+(defpackage ngn.text-io
+  (:use :cl
+		:ccl
+		:cl-annot))
+(in-package :ngn.text-io)
 
-;; (defpackage #:ngn
-;;   (:import-from #:cl-user)
-;;   (:import-from #:cl-ppcre)
-;;   (:export #:ngn))
+(cl-annot:enable-annot-syntax)
 
 
 (defun guess-encoding (filepath)
@@ -20,6 +20,7 @@
   :windows)
 
 
+@export
 (defun read-text (filepath)
   (let* ((text)
 		 (enc :utf-8)
@@ -38,3 +39,4 @@
 				((eq line 'eof) (reverse text))
 			  (setf text (cons line text))))))))
   
+
