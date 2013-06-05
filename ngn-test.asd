@@ -12,9 +12,7 @@
   :author "subaru45"
   :license "MIT"
   :depends-on (:ngn
-			   :ngn.tag-parser
-			   :ngn.text-io
-               :cl-test-more)
+			   :cl-test-more)
   :components ((:module "t"
                 :components
                 ((:file "ngn"))))
