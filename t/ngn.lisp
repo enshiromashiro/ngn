@@ -87,14 +87,20 @@
 		(:-tagname "data3-")
 		(:tagname- "データ4")
 		(:tagname3001 "data5 ")))
-  
-  (is (ngn.tag-parser::parse-oneline-tags
-	   '(":tag["
-		 "hoge"
-		 ":hoge data"
-		 ":tag]"))
-	  nil))
 
+  ;; Deleted. Because of changing the specification to detect one-line-tags in block-tags.
+  ;; (is (ngn.tag-parser::parse-oneline-tags
+  ;; 	   '(":tag["
+  ;; 		 "hoge"
+  ;; 		 ":hoge data"
+  ;; 		 ":tag]"))
+  ;; 	  nil))
+  (is (ngn.tag-parser::parse-oneline-tags
+  	   '(":tag["
+  		 "hoge"
+  		 ":hoge data"
+  		 ":tag]"))
+	  '((:hoge "data"))))
 
 ;; ngn.tag-parser::parse-block-tags
 (deftest-with-handler
@@ -180,18 +186,31 @@
   (is (ngn.tag-parser::parse-tags nil) nil)
   (is-error (ngn.tag-parser::parse-tags "") 'type-error)
   
+  ;; Deleted. Because of changing the specification to detect one-line-tags in block-tags.
+  ;; (is (ngn.tag-parser::parse-tags
+  ;; 	   '(":title Soundness"
+  ;; 		 ":author subaru45"
+  ;; 		 ""
+  ;; 		 ":body["
+  ;; 		 ":hoge fuga"
+  ;; 		 "bunshou ga tsuduku..."
+  ;; 		 ":body]"))
+  ;; 	  '((:title "Soundness")
+  ;; 		(:author "subaru45")
+  ;; 		(:body ("bunshou ga tsuduku...")))))
   (is (ngn.tag-parser::parse-tags
-	   '(":title Soundness"
-		 ":author subaru45"
-		 ""
-		 ":body["
-		 ":hoge fuga"
-		 "bunshou ga tsuduku..."
-		 ":body]"))
-	  '((:title "Soundness")
-		(:author "subaru45")
-		(:body ("bunshou ga tsuduku...")))))
-
+  	   '(":title Soundness"
+  		 ":author subaru45"
+  		 ""
+  		 ":body["
+  		 ":hoge fuga"
+  		 "bunshou ga tsuduku..."
+  		 ":body]"))
+  	  '((:title "Soundness")
+  		(:author "subaru45")
+		(:hoge "fuga")
+  		(:body ("bunshou ga tsuduku...")))))
+  
 (run-test-all)
 
 (finalize)
