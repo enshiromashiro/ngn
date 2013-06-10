@@ -151,14 +151,14 @@
   (is (ngn.tag-parser::parse-block-tags
 	   '(":tag["
 		 "line1"))
-	  nil)
+	  :parse-error-at-eof)
   (is (ngn.tag-parser::parse-block-tags
 	   '(":tag1["
 		 "line1"
 		 ":tag]"
 		 ":tag2["
 		 "line2"))
-	  :ngn.tag-parser::parse-error-at-eof)
+	  :parse-error-at-eof)
   
   (is (ngn.tag-parser::parse-block-tags
 	   '(":tag1["
@@ -169,7 +169,7 @@
 		 ":tag3["
 		 "line3"
 		 ":tag3]"))
-	  :ngn.tag-parser::parse-error-at-eof)
+	  :parse-error-at-eof)
   
   (is (ngn.tag-parser::parse-block-tags
 	   '(":block-tag["

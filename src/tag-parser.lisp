@@ -43,35 +43,44 @@
 (defun parse-oneline-tags (text)
   (let ((tags))
 	(dolist (line text (reverse tags))
-	  (let ((tag (parse-tag line +tag-regex-oneline+)))
+	  (let ((tag (parse-oneline-tag line)))
 		(if (not (null tag))
 			(push tag tags))))))
 
 (defun parse-block-tags (text &optional tag-name lines)
   (if (null text)
-	  nil
+	  (if (not (null tag-name))
+		  :parse-error-at-eof
+		  nil)
 	  (flet ((tag-p (tag delim)
 			   (and (not (null tag)) (string= (cadr tag) delim))))
-		(if (null tag-name)
-			(let ((tag (parse-tag (car text) +tag-regex-block+)))
+		(let ((tag (parse-block-tag (car text))))
+		  (if (null tag-name)
 			  (if (tag-p tag +tag-block-delimiter-start+)
 				  (parse-block-tags (cdr text) (car tag))
-				  (parse-block-tags (cdr text))))
-			(let ((tag (parse-tag (car text) +tag-regex-block+)))
+				  (parse-block-tags (cdr text)))
 			  (if (and (tag-p tag +tag-block-delimiter-end+)
 					   (eq tag-name (gen-keyword (car tag))))
 				  (cons (list tag-name lines)
 						(parse-block-tags (cdr text)))
 				  (parse-block-tags (cdr text) 
-								   tag-name
-								   (reverse (cons (car text)
-												  (reverse lines))))))))))
+									tag-name
+									(if (null (parse-oneline-tag (car text)))
+										(reverse (cons (car text)
+													   (reverse lines)))
+										lines))))))))
+
+(defun parse-block-tag (line)
+  (parse-tag line +tag-regex-block+))
+
+(defun parse-oneline-tag (line)
+  (parse-tag line +tag-regex-oneline+))
 
 (defun parse-tag (line tag-regex)
   (if (and (stringp line) (emptyp line))
 	  nil
 	  (multiple-value-bind (_ tag) (scan-to-strings tag-regex line)
-		(if (null _)
+		(if (< (length tag) 2)
 			nil
 			(list (gen-keyword (svref tag 0)) (svref tag 1))))))
 
