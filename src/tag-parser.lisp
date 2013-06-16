@@ -36,6 +36,16 @@
 
 
 @export
+;; whoa...
+(defun get-tag-data (tag-name tags)
+  (let ((data)
+		(rev-tags (reverse tags)))
+	(dolist (tag rev-tags data)
+	  (if (eq tag-name (car tag))
+		  (setf data (cadr tag))))))
+
+
+@export
 (defun parse-tags (text)
   (append (parse-oneline-tags text)
 		  (parse-block-tags text)))
