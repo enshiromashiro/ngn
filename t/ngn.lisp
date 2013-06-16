@@ -210,6 +210,21 @@
   		(:author "subaru45")
 		(:hoge "fuga")
   		(:body ("bunshou ga tsuduku...")))))
+
+
+(deftest-with-handler
+	text-io.write-text-
+	(flet ((test-with-stream (test-func text expected-for-format)
+			 (let ((sout (make-string-output-stream)))
+			   (apply #'test-func (list -write-text sout text)
+				   (format t expected-for-format)))))
+	  (test-with-stream #'is nil nil)
+	  (test-with-stream #'is '("a line") "a line~%")
+	  (test-with-stream #'is '("first line."
+							   "second line."
+							   "third line.")
+						"first line.~%second line.~%third line.^%")))
+
   
 (run-test-all)
 

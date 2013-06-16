@@ -31,12 +31,33 @@
 					 :external-format (make-external-format :character-encoding enc
 															:line-termination lt)
 					 :if-does-not-exist nil)
-	  (if (null in)
-		  'does-not-exists
-		  (flet ((get-line (fin)
-				   (read-line fin nil 'eof)))
-			(do ((line (get-line in) (get-line in)))
-				((eq line 'eof) (reverse text))
-			  (setf text (cons line text))))))))
-  
+	  (-read-text in))))
 
+(defun -read-text (in)
+  (if (null in)
+	  :does-not-exists
+	  (let ((text))
+		(flet ((get-line (fin)
+				 (read-line fin nil :eof)))
+		  (do ((line (get-line in) (get-line in)))
+			  ((eq line :eof) (reverse text))
+			(setf text (cons line text)))))))
+
+@export
+(defun write-text (filepath text)
+  (let* ((enc :utf-8)
+		 (lt :windows))
+	(with-open-file (out
+					 filepath
+					 :direction :output
+					 :external-format (make-external-format :character-ending enc
+															:line-termination lt)
+					 :if-does-not-exist nil)
+	  (-write-text out text))))
+
+(defun -write-text (out text)
+  (if (null text)
+	  nil
+	  (progn
+		(write-line (car text) out)
+		(write-text- out (cdr text)))))
