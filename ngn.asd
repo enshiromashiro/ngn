@@ -25,7 +25,8 @@
                 :components
                 ((:file "ngn" :depends-on ("tag-parser" "text-io"))
 				 (:file "tag-parser")
-				 (:file "text-io"))))
+				 (:file "text-io")
+				 (:file "generator" :depends-on ("tag-parser")))))
   :description "novel page generator"
   :long-description
   #.(with-open-file (stream (merge-pathnames
