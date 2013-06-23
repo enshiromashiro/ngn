@@ -10,8 +10,10 @@
   (:import-from :cl-ppcre
 				:scan-to-strings)
   (:import-from :ngn.tag-parser
-				:get-tag-data))
-(in-package :ngn)
+				:get-tag-data)
+  (:import-from :alexandria
+				:flatten))
+(in-package :ngn.generator)
 
 (cl-annot:enable-annot-syntax)
 
@@ -19,51 +21,45 @@
 (defmethod generate (extension tags template)
   (format t "generic: generate~%"))
 
-;;@export 
-;;(defmethod generate ((extention (eq "html")) tags template)
-;;  )  
+@export 
+(defmethod generate ((extention (eql 'html)) tags template)
+  (let ((generated))
+	(dolist (line template (reverse generated))
+	  (push (insert-tags-into-line line tags "#\\|([a-z-]+)\\|#")
+			generated))))
 
-(defun insert-tags-into-line (line tags tag-regex get-tag-name)
-  (let ((matches (ppcre:all-matches tag-regex line))
-		(inserted-list))
-	(format t "~a  ~%" matches)
-	(do ((pos (head-two matches) (head-two matches)))
-		((null pos) inserted-list)
-	  (let ((tag-data (get-tag-data 
-					   (apply get-tag-name 
-							  `(,(subseq line (car pos) (cadr pos)))) tags)))
-		(insert-into-line line
-						  (car pos)
-						  (cadr pos)
-						  tag-data))
-	  (setf matches (cddr matches)))))
+(defun insert-tags-into-line (line tags marker-regex)
+  (let ((split (split-line line
+						   (ppcre:all-matches marker-regex line))))
+	(do ((i 0 (1+ i)))
+		((>= i (length split)))
+	  (let ((marker (multiple-value-list 
+					 (ppcre:scan-to-strings marker-regex
+											(nth i split)))))
+		(if (not (null (car marker)))
+			(setf (nth i split) 
+				  (get-tag-data (svref (cadr marker) 0) tags)))))
+	(apply #'concatenate 'string (flatten split))))
 
-(defmethod insert-into-line (target-line start end (line string))
-  (concatenate 'string
-			   (subseq target-line 0 start)
-			   line
-			   (subseq target-line end (length target-line))))
+(defun split-line (line pos)
+  (remove-empty-string 
+   (-split-line line pos)))
 
-(defmethod insert-into-line (target-line start end (text list))
-  (if (null text)
-	  target-line
-	  (if (eq (length text) 1)
-		  (insert-to-line target-line start end (car text))
-		  (let ((inserted)
-				(before (subseq target-line 0 start))
-				(after (subseq target-line end (length target-line))))
-			(push (concatenate 'string before (car text)) inserted)
-			(let ((rest (cdr text)))
-			  (dolist (l rest)
-				(push l inserted))
-			  (setf (car inserted) (concatenate 'string (car inserted) after)))
-		  (reverse inserted)))))
+(defun remove-empty-string (strs)
+  (remove "" strs :test #'equal))
 
+(defun -split-line (line pos)
+  (if (null pos)
+	  (list line)
+	  (let ((prev-pos 0)
+			(str-list))
+		(do ((i 0 (1+ i)))
+			((>= i (length pos)))
+		  (setf str-list
+				(cons (subseq line prev-pos (nth i pos))
+					  str-list))
+		  (setf prev-pos (nth i pos)))
+		(reverse
+		 (cons (subseq line prev-pos (length line))
+			   str-list)))))
 
-
-(defun head-two (lis)
-  (if (or (null lis)
-		  (null (cdr lis)))
-	  nil
-	  (values (list (car lis) (cadr lis))
-			  (cddr lis))))
