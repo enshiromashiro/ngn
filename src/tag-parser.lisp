@@ -41,7 +41,7 @@
   (let ((data)
 		(rev-tags (reverse tags)))
 	(dolist (tag rev-tags data)
-	  (if (eq tag-name (car tag))
+	  (if (eq (gen-keyword tag-name) (car tag))
 		  (setf data (cadr tag))))))
 
 
