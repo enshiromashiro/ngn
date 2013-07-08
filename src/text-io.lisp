@@ -50,7 +50,7 @@
 	(with-open-file (out
 					 filepath
 					 :direction :output
-					 :external-format (make-external-format :character-ending enc
+					 :external-format (make-external-format :character-encoding enc
 															:line-termination lt)
 					 :if-does-not-exist nil)
 	  (-write-text out text))))
@@ -60,4 +60,4 @@
 	  nil
 	  (progn
 		(write-line (car text) out)
-		(write-text- out (cdr text)))))
+		(-write-text out (cdr text)))))
