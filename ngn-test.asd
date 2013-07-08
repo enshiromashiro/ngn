@@ -15,5 +15,8 @@
 			   :cl-test-more)
   :components ((:module "t"
                 :components
-                ((:file "ngn"))))
+                ((:file "ngn" :depends-on ("tag-parser" "text-io" "generator"))
+				 (:file "tag-parser")
+				 (:file "text-io")
+				 (:file "generator" :depends-on ("tag-parser")))))	 
   :perform (load-op :after (op c) (asdf:clear-system c)))
