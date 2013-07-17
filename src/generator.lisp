@@ -58,21 +58,23 @@
 
 
 (defun insert-tags-into-line (line tags marker-regex)
-  (let ((split (split-line line
-						   (ppcre:all-matches marker-regex line))))
-	(do ((i 0 (1+ i)))
-		((>= i (length split)))
-	  (let ((marker (multiple-value-list 
-					 (ppcre:scan-to-strings marker-regex
-											(nth i split)))))
-		(if (not (null (car marker)))
-			(progn
-			  (setf (nth i split) 
-					(get-tag-data (svref (cadr marker) 0) tags))))))
-;;	(format t "split: ~s~%" split)
-	(if (reduce (lambda (a b) (and a b)) (mapcar #'atom split))	   
-		(apply #'concatenate 'string (flatten split))
-		(flatten-block-tag split))))
+  (if (zerop (length line))
+	  ""
+	  (let ((split (split-line line
+							   (ppcre:all-matches marker-regex line))))
+		(do ((i 0 (1+ i)))
+			((>= i (length split)))
+		  (let ((marker (multiple-value-list 
+						 (ppcre:scan-to-strings marker-regex
+												(nth i split)))))
+			(if (not (null (car marker)))
+				(progn
+				  (setf (nth i split) 
+						(get-tag-data (svref (cadr marker) 0) tags))))))
+;;		(format t "split: ~s~%" split)
+		(if (reduce (lambda (a b) (and a b)) (mapcar #'atom split))	   
+			(apply #'concatenate 'string (flatten split))
+			(flatten-block-tag split)))))
 
 ;; (defun flatten-line-tree (strlis &optional prev)
 ;;   (if (null strlis)
