@@ -29,11 +29,11 @@
 
 (deftest-with-handler
   text-io.-read-text
+  (is (ngn.text-io::-read-text nil) :does-not-exists)
   (macrolet ((test-with-stream (test txt expected)
 			   `(let ((sin (make-string-input-stream ,txt)))
 				  (,test (ngn.text-io::-read-text sin)
 						 ,expected))))
-	(test-with-stream is nil :does-not-exists)
 	(test-with-stream is "" nil)
 	(test-with-stream is "hoge" '("hoge"))
 	(test-with-stream is (format nil "first~%second~%") '("first" "second"))))

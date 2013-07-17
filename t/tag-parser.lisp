@@ -42,7 +42,7 @@
 ;; tag-parser::parse-tag
 (deftest-with-handler
 	tag-parser.parse-tag
-  (is-error (ngn.tag-parser::parse-tag 42 "") 'type-error)
+  (is-error (ngn.tag-parser::parse-tag 42 "") type-error)
   (ok (null (ngn.tag-parser::parse-tag "" "")))
   
   (ok (null (ngn.tag-parser::parse-tag "" 42)))
@@ -59,7 +59,7 @@
 (deftest-with-handler
 	tag.parser.parse-oneline-tags
   (is (ngn.tag-parser::parse-oneline-tags nil) nil)
-  (is-error (ngn.tag-parser::parse-oneline-tags "") 'type-error)
+  (is-error (ngn.tag-parser::parse-oneline-tags "") type-error)
   
   (is (ngn.tag-parser::parse-oneline-tags
 	   '("line 1"
@@ -185,7 +185,7 @@
 (deftest-with-handler
 	tag-parser.parse-tags
   (is (ngn.tag-parser::parse-tags nil) nil)
-  (is-error (ngn.tag-parser::parse-tags "") 'type-error)
+  (is-error (ngn.tag-parser::parse-tags "") type-error)
   
   ;; Deleted. Because of changing the specification to detect one-line-tags in block-tags.
   ;; (is (parse-tags
