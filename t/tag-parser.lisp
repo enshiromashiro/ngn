@@ -216,6 +216,7 @@
 ;; get-tag-data
 (deftest-with-handler
   tag-parser.get-tag-data
+  (is (get-tag-data "hoge" nil) nil)
   (let ((tags '((:hoge "*hoge*")
 				(:fuga ("DAN" "DON" "FUGA"))
 				(:piyo "ぴよ")
