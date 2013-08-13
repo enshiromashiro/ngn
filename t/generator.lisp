@@ -83,7 +83,8 @@
 		(tags '((:hoge "*hoge*")
 				(:fuga ("DAN" "DON" "FUGA"))
 				(:foo "*foo*")
-				(:bar ("BAR" "BEE" "BOO")))))
+				(:bar ("BAR" "BEE" "BOO"))
+				(:hoge "XXX"))))
 	(flet ((insert-tags (line)
 			 (ngn.generator::insert-tags-into-line line tags regex)))
       (is (insert-tags "") "")
@@ -96,7 +97,7 @@
 	  (is (insert-tags "aaa #|fuga|# bbb")
 		  '("aaa DAN" "DON" "FUGA bbb"))
 	  (is (insert-tags "aaa #|fuga|# : #|bar|# bbb")
-		  '("aaa DAN" "DON" "FUGA : BAR" "BEE" "BOO bbb"))
+	  '("aaa DAN" "DON" "FUGA : BAR" "BEE" "BOO bbb"))
 	  (is (insert-tags "aaa #|hoge|# - #|fuga|# bbb")
 		  '("aaa *hoge* - DAN" "DON" "FUGA bbb"))
 	  (is (insert-tags "aaa #|bar|# - #|foo|# bbb")
@@ -104,6 +105,16 @@
 	  (is (insert-tags "+++#|bar|#---#|fuga|#***")
 		  '("+++BAR" "BEE" "BOO---DAN" "DON" "FUGA***")))))
 
-			 
+
+(deftest-with-handler
+  generagot.insert-tags-into-lines
+  (let ((regex "#\\|([a-z0-9-]+)\\|#")
+		(tags '((:hoge ("hoge1" "hoge2" "hoge3"))
+				(:fuga "fuga"))))
+	(flet ((insert-tags (lines)
+			 (ngn.generator::insert-tags-into-lines lines tags regex)))
+	  (is (insert-tags '("1111" "2222 #|hoge|# 2222" "3333 #|fuga|# 3333" "4444"))
+		  '("1111" "2222 hoge1" "hoge2" "hoge3 2222" "3333 fuga 3333" "4444")))))
+		 
 
 (finalize)

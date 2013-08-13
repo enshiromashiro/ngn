@@ -56,6 +56,10 @@
 			(apply (cddr item) (list generated)))))))
 
 
+(defun insert-tags-into-lines (lines tags marker-regex)
+  (let ((generated))
+	(dolist (line lines (flatten (reverse generated)))
+	  (push (insert-tags-into-line line tags marker-regex) generated))))
 
 (defun insert-tags-into-line (line tags marker-regex)
   (if (zerop (length line))
