@@ -52,7 +52,7 @@
 					 :direction :output
 					 :external-format (make-external-format :character-encoding enc
 															:line-termination lt)
-					 :if-does-not-exist nil)
+					 :if-exists nil)
 	  (-write-text out text))))
 
 (defun -write-text (out text)
