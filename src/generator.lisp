@@ -22,16 +22,26 @@
 (defvar *generators* nil)
 
 ;; add html generator
-(setf *generators*
-	  (acons :html 
-			 `("#\\|([a-z0-9-]+)\\|#"
-			   .
-			   ,(lambda (text)
-						(let ((result))
-						  (dolist (line text result)
-							(push (concatenate 'string line "<br>")
-								  result)))))
-			 *generators*))
+;; load *generator*
+;; *generator*
+;; 1. extension
+;; 2. marker rege
+;; 3. preproccess for oneline tag
+;; 4. preproccess for block tag
+(defvar *generators* nil)
+
+;; html generator
+(push (list :html 
+			"#\\|([a-z0-9-]+)\\|#"
+			#'identity
+			(lambda (tag)
+			  (list (car tag)
+					(if (not (eq (length (cadr tag)) 1))
+						(let ((proccessed))
+						  (dolist (elm (cadr tag) (reverse proccessed))
+							(push (concatenate 'string elm "<br>") proccessed)))))))
+	  *generators*)
+
 
 ;; (defmethod generate ((extension (eql 'html)) tags template)
 ;;   (format t "generate[~a]: generating...~%" extention)
@@ -42,24 +52,30 @@
 
 @export 
 (defun generate (extension tags template)
-  (let ((item (assoc extension *generators*)))
-	(if (null item)
+  (let ((filetype (car (member extension *generators* :key #'car))))
+	(if (null filetype)
 		(progn
-		  (format t "generate[~a]: no extension dispatched.~%" extension)
-		  template)
+		  (format t "generate[~a]: no extension dispatched.~%" extension))
 		(progn
-		  (format t "generate[~a]: generating...~%" extension)	
-		  (let ((generated))
-			(dolist (line template (reverse generated))
-			  (push (insert-tags-into-line line tags (cadr item))
-					generated))
-			(apply (cddr item) (list generated)))))))
+		  (format t "generate[~a]: generating...~%" extension)
+		  (let ((procced (preproc-tags tags
+										   (nth 2 filetype)
+										   (nth 3 filetype))))
+			(insert-tags-into-lines template procced (nth 1 filetype)))))))
 
+
+(defun preproc-tags (tags oneline-proc block-proc)
+  (let ((new-tags))
+	(dolist (tag tags (reverse new-tags))
+	  (if (atom (cadr tag))
+		  (push (funcall oneline-proc tag) new-tags)
+		  (push (funcall block-proc tag) new-tags)))))
 
 (defun insert-tags-into-lines (lines tags marker-regex)
   (let ((generated))
 	(dolist (line lines (flatten (reverse generated)))
 	  (push (insert-tags-into-line line tags marker-regex) generated))))
+
 
 (defun insert-tags-into-line (line tags marker-regex)
   (if (zerop (length line))
