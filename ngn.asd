@@ -23,7 +23,7 @@
                :alexandria)
   :components ((:module "src"
                 :components
-                ((:file "ngn" :depends-on ("tag-parser" "text-io"))
+                ((:file "ngn" :depends-on ("generator" "tag-parser" "text-io"))
 				 (:file "tag-parser")
 				 (:file "text-io")
 				 (:file "generator" :depends-on ("tag-parser")))))
