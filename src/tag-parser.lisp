@@ -21,12 +21,12 @@
 (defconstant +tag-identifer-valid-chars+ "[a-z0-9-]")
 (defconstant +tag-regex-oneline+ 
   (concatenate 'string
-			   ":("
+			   "^:("
 			   +tag-identifer-valid-chars+
 			   "+?)[ ]+(.+)$"))
 (defconstant +tag-regex-block+
   (concatenate 'string
-			   ":("
+			   "^:("
 			   +tag-identifer-valid-chars+
 			   "+?)(\\"
 			   (string +tag-block-delimiter-start+)
