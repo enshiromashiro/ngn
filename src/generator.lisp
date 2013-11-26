@@ -39,7 +39,8 @@
 					(if (not (eq (length (cadr tag)) 1))
 						(let ((proccessed))
 						  (dolist (elm (cadr tag) (reverse proccessed))
-							(push (concatenate 'string elm "<br>") proccessed)))))))
+							(push (concatenate 'string elm "<br>") proccessed)))
+						(cadr tag)))))
 	  *generators*)
 
 
