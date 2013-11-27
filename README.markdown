@@ -6,16 +6,16 @@ ngn [target-file] [template-file]
 ## Installation
 Generate a executable and run it, in terminal.
 
-1. get sources in your computer.
+1.get sources in your computer.
 
      $ cd /to/install/dir
      $ hg cl http://bitbucket.org/subaru45/ngn
     
-2. run `make` to generate a executables.
+2.run `make` to generate a executables.
 
      $ make
 
-3. move the executables to /home/yourname/bin
+3.move the executables to /home/yourname/bin
 
      $mv /home/yourname/bin
 
@@ -29,5 +29,5 @@ Copyright (c) 2013 subaru45
 
 # License
 
-Licensed under the MIT License.
+Licensed under the NYSL.
 
