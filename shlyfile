@@ -1,0 +1,20 @@
+;; shlyfile for ngn
+
+(load "ngn.asd")
+(ql:quickload :ngn)
+
+
+;; save application for ccl
+(defun save-app.ccl ()
+  (ccl:save-application
+   "ngn"
+   :toplevel-function #'ngn:call-main
+   :prepend-kernel t))
+
+;; save application for sbcl
+;;(defun save-app.sbcl ()
+;;  ;; make execute
+;;  )
+
+
+	
