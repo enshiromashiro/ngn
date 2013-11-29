@@ -23,10 +23,11 @@
                :alexandria)
   :components ((:module "src"
                 :components
-                ((:file "ngn" :depends-on ("generator" "tag-parser" "text-io"))
+                ((:file "ngn" :depends-on ("generator" "tag-parser" "text-io" "util"))
 				 (:file "tag-parser")
 				 (:file "text-io")
-				 (:file "generator" :depends-on ("tag-parser")))))
+				 (:file "generator" :depends-on ("tag-parser"))
+				 (:file "util"))))
   :description "novel page generator"
   :long-description
   #.(with-open-file (stream (merge-pathnames

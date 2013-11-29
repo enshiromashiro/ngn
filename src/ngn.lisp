@@ -13,7 +13,9 @@
                 :read-text
                 :write-text)
   (:import-from :ngn.generator
-                :generate))
+                :generate)
+  (:import-from :util
+				:args))
 (in-package :ngn)
 
 (cl-annot:enable-annot-syntax)
@@ -69,7 +71,7 @@
 ;; for clozure cl
 @export
 (defun call-main ()
-  (let ((args (cdr ccl:*command-line-argument-list*)))
+  (let ((args (cdr (args))))
 	(format t "[debug] args: ~s~%" args)
 	(handler-case
 		(ngn-main (nth 0 args) (nth 1 args))
