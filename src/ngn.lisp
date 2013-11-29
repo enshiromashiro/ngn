@@ -75,13 +75,14 @@ tag-hook: tags -> tags. hook for extracted tags."
 	(format t "[debug] args: ~s~%" args)
 	(let ((input-file (nth 0 args))
 		  (template-file (nth 1 args)))
-	  (handler-case
-		  (write-text (determine-output-filepath input-file template-file)
-					  (ngn (get-text input-filed "input-file")
-						   (get-text template-file "template-file")
-						   (gen-keyword (pathname-type template-file))))
-	  (condition (c)
-		(progn
-		  (format t "error caused!: ~a~%" c)
-		  (describe c *standard-output*)
-		  (quit 1)))))))
+	  (if (null template-file)
+		  (print-usage)
+		  (handler-case
+			  (write-text (determine-output-filepath input-file template-file)
+						  (ngn (get-text input-file "input-file")
+							   (get-text template-file "template-file")
+							   (gen-keyword (pathname-type template-file))))
+			(condition (c)
+			  (progn
+				(format t "~%error caused!: ~a~%~%" c)
+				(ccl:quit 1))))))))  

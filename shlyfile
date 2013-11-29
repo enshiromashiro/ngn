@@ -8,7 +8,7 @@
 (defun save-app.ccl ()
   (ccl:save-application
    "ngn"
-   :toplevel-function #'ngn:call-main
+   :toplevel-function #'ngn:app
    :prepend-kernel t))
 
 ;; save application for sbcl
