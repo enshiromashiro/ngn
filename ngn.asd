@@ -15,7 +15,7 @@
 (in-package :ngn-asd)
 
 (defsystem ngn
-  :version "0.1"
+  :version "0.6"
   :author "subaru45"
   :license "MIT"
   :depends-on (:cl-ppcre
