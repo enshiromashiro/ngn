@@ -21,3 +21,7 @@
   #+cmu ext:*command-line-words*
   #+ccl ccl:*command-line-argument-list*
   #+lispworks system:*line-arguments-list*)
+
+@export
+(defun gen-keyword (name)
+  (car (multiple-value-list (intern (string-upcase name) :keyword))))

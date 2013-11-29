@@ -15,14 +15,12 @@
   (:import-from :ngn.generator
                 :generate)
   (:import-from :util
-				:args))
+				:args
+				:gen-keyword))
 (in-package :ngn)
 
 (cl-annot:enable-annot-syntax)
 
-
-;;(let ((text (read-text "hoge.txt")))
-;;  (format t "~a~%" (parse-tags text)))
 
 (defvar *usage*
   '("USAGE: ngn [DATAFILE] [TEMPLATE]"
@@ -56,24 +54,34 @@
     output-filepath))
 
 
-(defun ngn-main (data-filepath temp-filepath)
-  (format t "~a~%" *ngn*)
-  (let ((text (get-text data-filepath "input-file"))
-        (temp (get-text temp-filepath "template-file")))
-    (if (and (null text) (null temp))
-        (print-usage)
-        (write-text (determine-output-filepath data-filepath temp-filepath)
-                    (generate (intern (string-upcase (pathname-type temp-filepath)) 'keyword)
-                              (parse-tags text)
-                              temp)))))
-
-
-;; for clozure cl
 @export
-(defun call-main ()
+(defun ngn (text temp type &key (tag-hook #'identity))
+"ngn main procedure.
+ngn: text, temp, type, post-proc-tag -> generated-text
+*args
+text: input file. a list of strings.
+temp: template file. a list of strings.
+type: file type of template. keyword.
+tag-hook: tags -> tags. hook for extracted tags."
+  (format t "~a~%" *ngn*)
+  (if (and (null text) (null temp))
+	  (print-usage)
+	  (generate type (funcall tag-hook (parse-tags text)) temp)))
+
+@export
+(defun app ()
+  "toplevel-function"
   (let ((args (cdr (args))))
 	(format t "[debug] args: ~s~%" args)
-	(handler-case
-		(ngn-main (nth 0 args) (nth 1 args))
+	(let ((input-file (nth 0 args))
+		  (template-file (nth 1 args)))
+	  (handler-case
+		  (write-text (determine-output-filepath input-file template-file)
+					  (ngn (get-text input-filed "input-file")
+						   (get-text template-file "template-file")
+						   (gen-keyword (pathname-type template-file))))
 	  (condition (c)
-		(format t "error caused!: ~a~%" c)))))
+		(progn
+		  (format t "error caused!: ~a~%" c)
+		  (describe c *standard-output*)
+		  (quit 1)))))))

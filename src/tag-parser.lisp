@@ -9,7 +9,9 @@
   (:import-from :alexandria
 				:emptyp)
   (:import-from :cl-ppcre
-				:scan-to-strings))
+				:scan-to-strings)
+  (:import-from :util
+				:gen-keyword))
 (in-package :ngn.tag-parser)
 
 (cl-annot:enable-annot-syntax)
@@ -93,7 +95,3 @@
 		(if (< (length tag) 2)
 			nil
 			(list (gen-keyword (svref tag 0)) (svref tag 1))))))
-
-(defun gen-keyword (name)
-  (car (multiple-value-list (intern (string-upcase name)
-									:keyword))))
