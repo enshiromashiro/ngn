@@ -3,18 +3,34 @@
 (load "ngn.asd")
 (ql:quickload :ngn)
 
-
-;; save application for ccl
-(defun save-app.ccl ()
-  (ccl:save-application
-   "ngn"
-   :toplevel-function #'ngn:app
-   :prepend-kernel t))
-
-;; save application for sbcl
-;;(defun save-app.sbcl ()
-;;  ;; make execute
-;;  )
+(load "ngn-test.asd")
+(ql:quickload :ngn-test)
+(ql:quickload :cl-test-more)
 
 
+;; app name
+(defvar *app-name* "ngn")
+
+;; toplevel function
+(defvar *app-toplevel* #'ngn:app)
+
+;; save application
+(defun save-app ()
+  #+sbcl (sb-ext:save-lisp-and-die *app-name*
+								   :toplevel *app-toplevel*
+								   :executable t)
+  #+clisp (ext:saveinitmem *app-name*
+						   :quiet t
+						   :norc t
+						   :init-function (lambda ()
+											(funcall *app-toplevel*)
+											(ext:exit))
+						   :executable t)
+  #+ccl (ccl:save-application *app-name*
+							  :toplevel-function *app-toplevel*
+							  :prepend-kernel t))
 	
+;; test all
+(defun test ()
+  (cl-test-more:run-test-all))
+
