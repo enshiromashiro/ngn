@@ -6,7 +6,6 @@
 (in-package :cl-user)
 (defpackage ngn.text-io
   (:use :cl
-		:ccl
 		:cl-annot))
 (in-package :ngn.text-io)
 
@@ -28,8 +27,7 @@
 	(with-open-file (in
 					 filepath
 					 :direction :input
-					 :external-format (make-external-format :character-encoding enc
-															:line-termination lt)
+					 :external-format enc
 					 :if-does-not-exist nil)
 	  (-read-text in))))
 
@@ -50,8 +48,7 @@
 	(with-open-file (out
 					 filepath
 					 :direction :output
-					 :external-format (make-external-format :character-encoding enc
-															:line-termination lt)
+					 :external-format enc
 					 :if-exists nil)
 	  (-write-text out text))))
 

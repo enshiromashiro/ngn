@@ -16,6 +16,7 @@
                 :generate)
   (:import-from :util
 				:args
+				:quit
 				:gen-keyword))
 (in-package :ngn)
 
@@ -85,4 +86,4 @@ tag-hook: tags -> tags. hook for extracted tags."
 			(condition (c)
 			  (progn
 				(format t "~%error caused!: ~a~%~%" c)
-				(ccl:quit 1))))))))  
+				(quit 1))))))))  
