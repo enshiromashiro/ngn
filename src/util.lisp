@@ -20,20 +20,14 @@ http://www.cliki.net/portable%20exit"
   #+allegro (excl:exit code)
   #+clisp (#+lisp=cl ext:quit #-lisp=cl lisp:quit code)
   #+cmu (ext:quit code)
-  #+cormanlisp (win32:exitprocess code)
   #+gcl (lisp:bye code)                     ; XXX Or is it LISP::QUIT?
   #+lispworks (lw:quit :status code)
-  #+lucid (lcl:quit code)
   #+sbcl (sb-ext:quit
 		  :unix-code (typecase code (number code) (null 0) (t 1)))
-  ;; This group from Maxima
-  #+kcl (lisp::bye)                         ; XXX Does this take an arg?
-  #+scl (ext:quit code)                     ; XXX Pretty sure this *does*.
   #+(or openmcl mcl) (ccl::quit)
   #+abcl (cl-user::quit)
   #+ecl (si:quit)
-  ;; This group from <hebi...@math.uni.wroc.pl>
-  #+poplog (poplog::bye)                    ; XXX Does this take an arg?
+
   #-(or allegro clisp cmu cormanlisp gcl lispworks lucid sbcl
 		kcl scl openmcl mcl abcl ecl)
   (error 'not-implemented :proc (list 'quit code)))
@@ -43,3 +37,23 @@ http://www.cliki.net/portable%20exit"
 (defun gen-keyword (name)
   "generate keyword from string."
   (car (multiple-value-list (intern (string-upcase name) :keyword))))
+
+
+@export
+(defparameter *debug* nil
+  "debug switch. it's default value is nil")
+
+@export
+(defparameter *debug-output* *standard-output*
+  "output stream for function `debug`")
+
+@export
+(defun debug (str)
+  "print debug message if *debug* is t.
+*args
+str: it's string or list of strings."
+  (and *debug*
+	   (if (listp str)
+		   (dolist (e str)
+			 (format *debug-output* "~a~%" e))
+		   (format *debug-output* "~a~%" str))))
