@@ -1,0 +1,261 @@
+\documentclass[a4j]{jsarticle}
+
+\usepackage{listings, jlisting}
+\lstset{%
+breaklines=true,
+frame=single,
+basicstyle=\scriptsize
+}
+
+
+\newcommand{\emptyline}{\vspace{1em}}
+
+
+\begin{document}
+
+\title{ngn -novel page generator-}
+\author{@subaru45}
+\date{2013-11-30}
+\maketitle
+
+
+\section{なんぞや}
+ngn はタグをつけておいたテキストファイルから、そのタグを抽出してテンプレートファイルに埋め込むツールです。
+開発目的はウェブサイト用の小説・文章ページを自動生成することですが、ほかの用途にも使えなくもないです。
+
+タグ (後述) を付したテキストファイルをテンプレートファイルのタグ部分に埋め込んだファイルを出力します。
+
+出力形式はテンプレートファイルの拡張子で判別します。
+が、現状では html のみです。
+将来的に \TeX をサポートし、さらに、自力で出力形式を追加できるシステムにする予定です。
+
+現在、扱える文字コードは \textbf{utf-8 のみ}です。
+
+\subsection{うんぬん}
+導入の時点でそもそもハードルが高いですが、ngn は NYSL (煮るなり焼くなり好きにしろライセンス)\footnote{http://nysl.com} を採用しています。
+NYSL の元で許される限りにおいて、如何様にも改変し配布し破棄することができます。
+
+
+
+\section{導入}
+ngn の導入には Common Lisp 処理系\footnote{開発は Clozure CL (http://ccl.clozure.com) で行っています。}と quicklisp\footnote{Common Lisp 版 CPAN。http://quicklisp.org/beta}  と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} が既に導入されていることを前提とします。
+
+実行可能バイナリの生成は shelly を利用しますが、そのため Windowsでは perl5 の導入も必要のようです。
+
+Windows向けバイナリはいずれ用意します。
+
+導入方法は以下。
+\begin{enumerate}
+  \item ソースの取得 \\
+    下記プロジェクトからソースを取得します: \\
+    http://bitbucket.org/subaru45/ngn/
+
+  \item 実行可能バイナリの作成 \\
+    取得したソースのディレクトリに入り、shly save-app を実行します。
+
+  \item パスの通ったディレクトリに移動 \\
+    生成されたファイル ngn を /usru/local/bin などパスの通ったディレクトリに移動します。
+\end{enumerate}
+
+
+\section{つかいかた}
+ngn の使い方を説明します。
+
+まず、出力したいテキストファイル中の文字列にタグを付けます 。タグが付されたテキストファイルを\textbf{タグ付きファイル}と呼びます。
+タグ付きファイルにおいて、あるタグ spam が付けられた文字列を\textbf{spam のテキスト}と呼びます。
+次にテンプレートを用意し、ファイル中に出力したいタグ指定子を記述しておきます。
+最後に、タグ付きファイルとテンプレートを ngn に食わせると、テンプレートのタグ指定子の箇所に、そのタグのテキストが挿入されたファイルができあがります。
+
+タグは書式さえ満たしていればいくつでも好きなように定義できます。
+もしテンプレート中にタグ付きファイルにないタグを指定した場合、そのタグ指定子の箇所には空文字列が挿入されます。
+
+
+\subsection{タグ付きファイル}
+まず、タグを付けたテキストファイルを作成します。
+
+
+タグには一行タグとブロックタグの二種類があります。
+二種ともに、\textbf{行の先頭に}コロン ':' とタグ名を記述するという形式は同じです。
+タグ名に利用できる文字はアルファベット小文字a-z、数字0-9、ハイフン'-'のみです。
+
+
+\subsubsection{一行タグ}
+一行タグは、改行を含まない文字列を記述するのに用います。
+例えば、題名、著者名、日付などです。
+\LaTeX でいうところの \textbackslash title や \textbackslash section 等のようなものだと考えてください (\LaTeX の上記コマンドは改行も含められますが……)。
+
+一行タグの書式は以下です。
+\begin{lstlisting}[caption=一行タグの書式]
+:tag-name 文字列...
+\end{lstlisting}
+タグ名の後ろのスペースは一つです。
+それ以降は改行までのスペースを含むすべての文字がタグ名に対応するテキストデータとなります。
+
+
+\subsubsection{ブロックタグ}
+ブロックタグは、改行を含む文字列を記述するのに用います。
+例えば、本文、後書き、説明などです。
+文書構造を記述するのに便利でしょう。
+
+ブロックタグの書式は以下です。
+\begin{lstlisting}[caption=ブロックタグの書式]
+:tag-name[
+文字列1...
+文字列2...
+...
+文字列n...
+:tag-name]
+\end{lstlisting}
+タグの開始・終了は、タグ名の後ろに括弧をつけて表します。
+開始は '['、終了は ']' です。
+カッコの直後で改行してください。
+ブロックタグ内にタグの記述がされていた場合、タグではなくただの文字列として処理されます。
+
+
+\subsubsection{注意事項}
+タグ付きテキストファイル中では、現状、行頭でコロンを使用できません 
+(エスケープシーケンス未実装のため)。
+
+同名のタグが複数存在した場合、ファイルの先頭に近いものが保持され、それ以降の同名タグは無視されます。
+例えば、下のタグ付きテキストファイル例の author タグのデータは「夏目漱石」となり「NATSUME Souseki」とはなりません。
+
+\lstinputlisting[caption=タグ付きテキストファイル例]{sample/sample.txt}
+
+
+
+\subsection{テンプレートファイル}
+出力ファイルの雛形を作ります。
+これは普通の HTML ファイルですが、タグのデータをどこに流し込むのか記述しておく必要があります。
+
+テンプレートファイル中のタグの指定は
+\begin{lstlisting}[caption=タグ指定の書式]
+#|tag-name|#
+\end{lstlisting}
+の書式で行います。
+これを書いた箇所がそのまま、そのタグのデータに置換されます。
+
+もし指定したタグが存在しない場合、空文字列になります。
+\lstinputlisting[caption=テンプレートファイルの例]{sample/template.html}
+
+
+
+\subsection{ngn コマンド}
+タグ付きテキストファイルとテンプレートファイルの用意ができたら、ファイルを生成します。
+生成には ngn コマンドを用います。
+
+\begin{lstlisting}[caption=ngn コマンドの使い方]
+  ngn [input-filepath] [template-filepath]
+\end{lstlisting}
+
+[input-filepath] はタグ付きテキストファイルのパス、[template-filepath] はテンプレートファイルのパスです。
+この二引数は必須です。
+引数が足りない、または存在しないファイルだった場合はメッセージを吐いて何もせず終了します (たぶん)\footnote{その場合の終了コードは 1 だったはず}。
+
+タグ付きテキストファイルの内容が残念だった場合の挙動はわかりません。
+ちゃんと不正な入力は原因ごと表示するように、いつか改良します。
+
+処理結果のファイルはカレントディレクトリに出力されます。
+つまり、別のディレクトリに存在するファイルを引数に指定しても、処理結果はターミナルで ngn コマンドを実行したディレクトリに作成されます。
+もし同名のファイルが存在した場合は \textbf{上書きせず、標準出力に}処理結果を出力します。
+コマンドを叩いたらターミナルにHTMLなりがずらずら表れた場合は、同名ファイルが存在したということになります。
+
+処理結果のファイル名は [input-filepath] の拡張子を [template-filepath] の拡張子に置き換えたものになります。
+例えば、カレントディレクトリが /home/sora のとき、 [input-filepath] を /home/sora/text/wonder2.txt 、[template-filepath] を /home/sora/web/temp.html をそれぞれ引数として ngn を実行すると、出力ファイル名は wonder2.html となり、/home/sora に出力されます。
+
+前2節でサンプルとしたファイルを引数に ngn を実行すると、次のような出力が得られます。
+
+\lstinputlisting[caption=生成されたファイル]{sample/sample.html}
+
+
+\section{あぺんでぃっくす}
+開発者向けな情報。
+あるいは仕様メモ。
+自分用。
+
+
+\subsection{タグ付きテキストファイルの仕様}
+
+タグ付きテキストファイルの仕様を示します。
+<oneline-tag> と <block-tag> の部分が重要です。
+
+\begin{lstlisting}[caption=タグ付きテキストファイル]
+<text> ::= <line>*
+<line> ::= <oneline-tag> | <block-tag> | <plain-line>
+
+<oneline-tag> ::= <tag-delimiter> <tag-identifer> <space> <data> <eol>
+
+<block-tag> ::= <block-tag-open> <plain-line>* <block-tag-close>
+<block-tag-open> ::= <tag-delimiter> <tag-identifer> <block-delimimter-open> <eol>
+<block-tag-close> ::= <tag-delimiter> <tag-identifer> <block-delimimter-close> <eol>
+  
+<tag-identifer> ::= a-z0-9- (lower alphabets, numerics and hyphen)  
+<tag-delimiter> ::= :
+<block-delimiter-open> ::= [
+<block-delimiter-close> ::= ]
+
+<plain-line> ::= .* <eol> (any strings s.t. ending with <eol>)  
+<eol> ::= \n
+\end{lstlisting}
+
+
+\subsection{タグについてのフック}
+ngn をさらに拡張する人向けの情報です。
+
+ngn では、抽出したタグをテンプレートに挿入する前に、抽出したタグに対してフック関数を実行するようになっています。
+これにより、抽出されたタグの中にさらに別の DSL が記述されている場合、それに処理を施してから、出力を行うことができます。
+
+たとえば、タグのデータ内に Markdown などの 言語を埋め込んでおき、タグ抽出後にそれらを出力前に処理してしまうといった用途に使えます。
+
+フック関数は ngn のメイン処理を行っている /src/ngn.lisp のngn:ngn 関数のキーワード引数 tag-hook に渡してください。
+tag-hook はタグのリストを受け取り、タグのリストを返すように記述してください。
+
+/* 
+あ。ngn.generator を外部ファイルで拡張可能にするわけだし、このフックは実はいらない気がしてきた。
+いらないよなあ……。
+あとで消えるかも。
+ */
+
+出力形式に依らない変換を行うのに用いてください。
+たとえば、
+\begin{lstlisting}
+(times 10 コワイ)
+\end{lstlisting}
+を
+\begin{lstlisting}
+コワイコワイコワイコワイコワイコワイコワイコワイコワイコワイ
+\end{lstlisting}
+に展開するとか、
+\begin{lstlisting}
+(times 5 (random-pickup "死シし" "ぬヌ") (nl))
+\end{lstlisting}
+を
+\begin{lstlisting}
+シヌ
+死ぬ
+シぬ
+しぬ
+しヌ
+\end{lstlisting}
+に展開するとか(nlはnew line)、そういう使い方。
+今のところ必要性は全くないけど。
+
+
+\subsubsection{タグのデータ構造}
+タグのデータ構造です。
+この構造を保つよう tag-hook を書いてください。
+
+\begin{lstlisting}[caption=タグのデータ構造]
+<tags> ::= ( <tag>* )
+<tag> ::= ( <oneline> | <block> )
+
+<oneline> ::= <tag-identifer> <string>
+<block> ::= <tag-identifer> <string-list>
+
+<string-list> ::= ( <string>*)
+<string> ::= Common Lisp の文字列
+<tag-identifer> ::= Common Lisp のキーワード
+
+\end{lstlisting}
+
+
+\end{document}
