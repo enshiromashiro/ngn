@@ -7,6 +7,9 @@
 (defpackage ngn
   (:use :cl
         :cl-annot)
+  (:import-from :unix-options
+				:getopt
+				:cli-options)
   (:import-from :ngn.tag-parser
                 :parse-tags)
   (:import-from :ngn.text-io
@@ -15,13 +18,18 @@
   (:import-from :ngn.generator
                 :generate)
   (:import-from :util
-				:args
 				:quit
 				:gen-keyword))
 (in-package :ngn)
 
 (cl-annot:enable-annot-syntax)
 
+
+(defvar *cli-short-options* nil
+  "command line short options.")
+
+(defvar *cli-long-options* nil
+  "command line long options.")
 
 (defvar *usage*
   '("USAGE: ngn [DATAFILE] [TEMPLATE]"
@@ -64,7 +72,6 @@ text: input file. a list of strings.
 temp: template file. a list of strings.
 type: file type of template. keyword.
 tag-hook: tags -> tags. hook for extracted tags."
-  (format t "~a~%" *ngn*)
   (if (and (null text) (null temp))
 	  (print-usage)
 	  (generate type (funcall tag-hook (parse-tags text)) temp)))
@@ -72,8 +79,12 @@ tag-hook: tags -> tags. hook for extracted tags."
 @export
 (defun app ()
   "toplevel-function"
-  (let ((args (cdr (args))))
-	(format t "[debug] args: ~s~%" args)
+  (multiple-value-bind (_ opts args)
+	  (getopt (cli-options) *cli-short-options* *cli-long-options*)
+	
+	(format t "[debug] args: ~s~%" (cli-options))
+	(format t "~a~%" *ngn*)
+	
 	(let ((input-file (nth 0 args))
 		  (template-file (nth 1 args)))
 	  (if (null template-file)
@@ -86,4 +97,4 @@ tag-hook: tags -> tags. hook for extracted tags."
 			(condition (c)
 			  (progn
 				(format t "~%error caused!: ~a~%~%" c)
-				(quit 1))))))))  
+				(quit 1))))))))
