@@ -54,6 +54,8 @@ http://www.cliki.net/portable%20exit"
 str: it's string or list of strings."
   (and *debug*
 	   (if (listp str)
-		   (dolist (e str)
-			 (format *debug-output* "~a~%" e))
-		   (format *debug-output* "~a~%" str))))
+		   (progn 
+			 (format *debug-output* "[debug]~%")
+			 (dolist (e str)
+			   (format *debug-output* "\t~a~%" e)))
+		   (format *debug-output* "[debug] ~a~%" str))))

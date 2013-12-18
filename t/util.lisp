@@ -13,7 +13,7 @@
 (plan nil)
 
 
-(diag "*** ngn test ***")
+(diag "*** util test ***")
 
 ;; gen-keyword
 (diag "* gen-keyword *")
@@ -34,13 +34,15 @@
   (test-debug nil "hoge" nil "")
   (test-debug nil '("hoge" "fuga") nil "")
 
-  (test-debug t nil nil "")
-  (test-debug t "" nil "
+  (test-debug t nil nil "[debug]
 ")
-  (test-debug t "hoge" nil "hoge
+  (test-debug t "" nil "[debug] 
 ")
-  (test-debug t '("hoge" "fuga") nil "hoge
-fuga
+  (test-debug t "hoge" nil "[debug] hoge
+")
+  (test-debug t '("hoge" "fuga") nil "[debug]
+\thoge
+\tfuga
 "))
 
 
