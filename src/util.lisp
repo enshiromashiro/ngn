@@ -57,5 +57,5 @@ str: it's string or list of strings."
 		   (progn 
 			 (format *debug-output* "[debug]~%")
 			 (dolist (e str)
-			   (format *debug-output* "\t~a~%" e)))
+			   (format *debug-output* "    ~a~%" e)))
 		   (format *debug-output* "[debug] ~a~%" str))))

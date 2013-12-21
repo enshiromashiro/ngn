@@ -42,8 +42,8 @@
 	(test-debug t "hoge" nil "[debug] hoge
 ")
 	(test-debug t '("hoge" "fuga") nil "[debug]
-\thoge
-\tfuga
+    hoge
+    fuga
 ")))
 
 
