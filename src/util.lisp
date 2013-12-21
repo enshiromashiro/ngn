@@ -44,11 +44,11 @@ http://www.cliki.net/portable%20exit"
   "debug switch. it's default value is nil")
 
 @export
-(defparameter *debug-output* *standard-output*
+(defparameter *debug-output* t
   "output stream for function `debug`")
 
 @export
-(defun debug (str)
+(defun dbg (str)
   "print debug message if *debug* is t.
 *args
 str: it's string or list of strings."
