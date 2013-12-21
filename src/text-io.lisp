@@ -6,17 +6,58 @@
 (in-package :cl-user)
 (defpackage ngn.text-io
   (:use :cl
-		:cl-annot))
+		:cl-annot)
+  (:import-from :guess
+				:ces-guess-from-vector))
 (in-package :ngn.text-io)
 
 (cl-annot:enable-annot-syntax)
 
 
-(defun guess-encoding (filepath)
-  :utf-8)
+(defmacro with-file-vector ((var size pathname enc) &body body)
+  "create vector buffer _var_ consists of first _size_ bytes of _pathname_ file, and evaluate _body_.
+*args
+var: name of var of vecter
+size: vector buffer size
+pathname: target file
+enc: available on *only CCL*. encoding of target file.
+body: body forms"
+  (let ((in (gensym)))
+	`(let ((,var (make-array ,size :element-type '(unsigned-byte 8))))
+	   (with-open-file
+		   (,in ,pathname
+				:direction :input
+				:element-type '(unsigned-byte 8)
+				#+ccl ,@(and enc `(:external-format (make-external-format :character-encoding ,enc))))
+		 (read-sequence ,var ,in))
+	   ,@body)))
 
-(defun guess-line-termination (filepath)
-  :windows)
+
+(defun guess-encoding (pathname &optional (size 10000))
+  "guess encding of _pathname_.
+*args
+pathname: pathname of the target file
+size: vector buffer size"
+  (with-file-vector (vec size pathname nil)
+	;; this function cannot guess sjis *on clozure cl*.
+	;; what can i do ... X(
+	(ces-guess-from-vector vec :jp)))
+
+
+(defun guess-line-break (pathname encoding &optional (size 10000))
+  "guess line break marker of _pathname_, when its encoding is _encoding_.
+*args
+pathname: pathname of the target file
+encoding: encoding of the target file
+size: vector buffer size"
+  (with-file-vector (vec size pathname encoding)
+	(loop for n from 0 to size do 
+		 (if (eq (code-char (aref vec n)) #\Return)  ; CR?
+			 (if (eq (code-char (aref vec (1+ n))) #\Newline)
+				 (return :crlf)  ; CRLF
+				 (return :cr)))  ; LF
+		 (if (eq (code-char (aref vec n)) #\Newline)  ; LF?
+			 (return :lf)))))
 
 
 @export
