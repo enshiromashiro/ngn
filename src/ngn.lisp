@@ -19,7 +19,8 @@
                 :generate)
   (:import-from :util
 				:quit
-				:gen-keyword))
+				:gen-keyword
+				:dbg))
 (in-package :ngn)
 
 (cl-annot:enable-annot-syntax)
@@ -28,7 +29,7 @@
 (defvar *cli-short-options* nil
   "command line short options.")
 
-(defvar *cli-long-options* nil
+(defvar *cli-long-options* '("debug")
   "command line long options.")
 
 (defvar *usage*
@@ -74,16 +75,24 @@ type: file type of template. keyword.
 tag-hook: tags -> tags. hook for extracted tags."
   (if (and (null text) (null temp))
 	  (print-usage)
-	  (generate type (funcall tag-hook (parse-tags text)) temp)))
+	  (let* ((tags (parse-tags text))
+			 (hooked (funcall tag-hook tags))
+			 (gen (generate type hooked temp)))
+		(dbg `("parsed tags..." ,@tags))
+		(if (not (tree-equal tags hooked :test #'equal))
+			(dbg `("hooked tags..." ,@hooked)))
+	  (generate type hooked temp))))
 
 @export
 (defun app ()
   "toplevel-function"
   (multiple-value-bind (_ opts args)
 	  (getopt (cli-options) *cli-short-options* *cli-long-options*)
-	
-	(format t "[debug] args: ~s~%" (cli-options))
 	(format t "~a~%" *ngn*)
+	
+	(if (member "debug" opts :test #'equal)
+		(setf util:*debug* t))
+	(dbg (format nil "args: ~s" (cli-options)))
 	
 	(let ((input-file (nth 0 args))
 		  (template-file (nth 1 args)))
