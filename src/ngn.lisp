@@ -34,7 +34,12 @@
 
 (defvar *usage*
   '("USAGE: ngn [DATAFILE] [TEMPLATE]"
-    "Generate text file from DATAFILE and TEMPLATE (Current directory by default output directory)."))
+    "Generate text file from DATAFILE and TEMPLATE"
+	"(Current directory by default output directory)."
+	""
+	"option:"
+	"--debug"
+	"  print debugging messages."))
 
 (defvar *ngn*
   "ngn - novel page generator")
