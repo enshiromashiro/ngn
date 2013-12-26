@@ -6,7 +6,7 @@
 (in-package :cl-user)
 (defpackage ngn.text-io-test
   (:use :cl
-		:ngn.text-io
+        :ngn.text-io
         :cl-test-more))
 (in-package :ngn.text-io-test)
 
@@ -15,12 +15,12 @@
 
 (eval-when (:load-toplevel :compile-toplevel :execute)
   (defmacro deftest-with-handler (test-name &rest forms)
-  	`(deftest ,test-name
-  		 (diag ,(format nil "test for ~a..." test-name))
-  	   (handler-case 
-  		   (progn ,@forms)
-  		 (condition (c) 
-  		   (fail "unexpected condition caused!: ~a~%" c))))))
+    `(deftest ,test-name
+         (diag ,(format nil "test for ~a..." test-name))
+       (handler-case 
+           (progn ,@forms)
+         (condition (c) 
+           (fail "unexpected condition caused!: ~a~%" c))))))
 
 (diag "ngn.text-io test")
 

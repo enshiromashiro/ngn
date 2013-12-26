@@ -23,13 +23,13 @@ http://www.cliki.net/portable%20exit"
   #+gcl (lisp:bye code)                     ; XXX Or is it LISP::QUIT?
   #+lispworks (lw:quit :status code)
   #+sbcl (sb-ext:quit
-		  :unix-code (typecase code (number code) (null 0) (t 1)))
+          :unix-code (typecase code (number code) (null 0) (t 1)))
   #+(or openmcl mcl) (ccl::quit)
   #+abcl (cl-user::quit)
   #+ecl (si:quit)
 
   #-(or allegro clisp cmu cormanlisp gcl lispworks lucid sbcl
-		kcl scl openmcl mcl abcl ecl)
+        kcl scl openmcl mcl abcl ecl)
   (error 'not-implemented :proc (list 'quit code)))
 
 
@@ -53,9 +53,9 @@ http://www.cliki.net/portable%20exit"
 *args
 str: it's string or list of strings."
   (and *debug*
-	   (if (listp str)
-		   (progn 
-			 (format *debug-output* "[debug]~%")
-			 (dolist (e str)
-			   (format *debug-output* "    ~a~%" e)))
-		   (format *debug-output* "[debug] ~a~%" str))))
+       (if (listp str)
+           (progn 
+             (format *debug-output* "[debug]~%")
+             (dolist (e str)
+               (format *debug-output* "    ~a~%" e)))
+           (format *debug-output* "[debug] ~a~%" str))))

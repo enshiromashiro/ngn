@@ -6,9 +6,9 @@
 (in-package :cl-user)
 (defpackage ngn.text-io
   (:use :cl
-		:cl-annot)
+        :cl-annot)
   (:import-from :guess
-				:ces-guess-from-vector))
+                :ces-guess-from-vector))
 (in-package :ngn.text-io)
 
 (cl-annot:enable-annot-syntax)
@@ -23,14 +23,14 @@ pathname: target file
 enc: available on *only CCL*. encoding of target file.
 body: body forms"
   (let ((in (gensym)))
-	`(let ((,var (make-array ,size :element-type '(unsigned-byte 8))))
-	   (with-open-file
-		   (,in ,pathname
-				:direction :input
-				:element-type '(unsigned-byte 8)
-				,@(and enc `(:external-format ,enc)))
-		 (read-sequence ,var ,in))
-	   ,@body)))
+    `(let ((,var (make-array ,size :element-type '(unsigned-byte 8))))
+       (with-open-file
+           (,in ,pathname
+                :direction :input
+                :element-type '(unsigned-byte 8)
+                ,@(and enc `(:external-format ,enc)))
+         (read-sequence ,var ,in))
+       ,@body)))
 
 
 (defun guess-encoding (pathname &optional (size 10000))
@@ -39,9 +39,7 @@ body: body forms"
 pathname: pathname of the target file
 size: vector buffer size"
   (with-file-vector (vec size pathname nil)
-	;; this function cannot guess sjis *on clozure cl*.
-	;; what can i do ... X(
-	(ces-guess-from-vector vec :jp)))
+    (ces-guess-from-vector vec :jp)))
 
 
 (defun guess-line-break (pathname encoding &optional (size 10000))
@@ -51,13 +49,13 @@ pathname: pathname of the target file
 encoding: encoding of the target file
 size: vector buffer size"
   (with-file-vector (vec size pathname encoding)
-	(loop for n from 0 to size do 
-		 (if (eq (code-char (aref vec n)) #\Return)  ; CR?
-			 (if (eq (code-char (aref vec (1+ n))) #\Newline)
-				 (return :dos)  ; CRLF
-				 (return :macos)))  ; LF
-		 (if (eq (code-char (aref vec n)) #\Newline)  ; LF?
-			 (return :unix)))))
+    (loop for n from 0 to size do 
+         (if (eq (code-char (aref vec n)) #\Return)  ; CR?
+             (if (eq (code-char (aref vec (1+ n))) #\Newline)
+                 (return :dos)  ; CRLF
+                 (return :macos)))  ; LF
+         (if (eq (code-char (aref vec n)) #\Newline)  ; LF?
+             (return :unix)))))
 
 @export
 (defun external-format-from-file (pathname)
@@ -109,13 +107,13 @@ this function returns two values:
 
 (defun -read-text (in)
   (if (null in)
-	  :does-not-exists
-	  (let ((text))
-		(flet ((get-line (fin)
-				 (read-line fin nil :eof)))
-		  (do ((line (get-line in) (get-line in)))
-			  ((eq line :eof) (reverse text))
-			(setf text (cons line text)))))))
+      :does-not-exists
+      (let ((text))
+        (flet ((get-line (fin)
+                 (read-line fin nil :eof)))
+          (do ((line (get-line in) (get-line in)))
+              ((eq line :eof) (reverse text))
+            (setf text (cons line text)))))))
 
 @export
 (defun write-text (pathname text enc lb)
