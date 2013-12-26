@@ -6,9 +6,10 @@ ngn [target-file] [template-file]
 
 ## Requirements
 
-* [common lisp implementation](http://www.cliki.net/common%20lisp%20implementation) (developing with ccl)
+* [clozure cl](http://ccl.clozure.com/) or [sbcl](http://www.sbcl.org/)
 * [quicklisp](http://beta.quicklisp.org)
 * [shelly](http://github.com/fukamachi/shelly)
+* [guess](http://github.com/t-sin/guess)
 
 
 ## Installation
@@ -37,5 +38,5 @@ Copyright (c) 2013 subaru45
 
 # License
 
-Licensed under the NYSL.
+Licensed under the [NYSL](http://www.kmonos.net/nysl/).
 
