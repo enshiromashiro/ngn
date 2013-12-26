@@ -54,23 +54,58 @@ size: vector buffer size"
 	(loop for n from 0 to size do 
 		 (if (eq (code-char (aref vec n)) #\Return)  ; CR?
 			 (if (eq (code-char (aref vec (1+ n))) #\Newline)
-				 (return :crlf)  ; CRLF
-				 (return :cr)))  ; LF
+				 (return :dos)  ; CRLF
+				 (return :macos)))  ; LF
 		 (if (eq (code-char (aref vec n)) #\Newline)  ; LF?
-			 (return :lf)))))
+			 (return :unix)))))
+
+@export
+(defun external-format-from-file (pathname)
+  "make external format from _pathname_.
+this function returns three values.
+first value is an external format.
+second value is an encoding of _pathname_.
+third balue is type of line break of _pathname_.
+*args
+pathname: pathname of the target file"
+  (let* ((enc (guess-encoding pathname))
+         (lb (guess-line-break pathname enc)))
+    ;; util:dbg is not merged... XD
+    ;; (dbg `(,(format nil "~a" pathname)
+    ;;      (format nil "encoding: ~a" enc)
+    ;; 	    (format nil "line-break: ~a" lb)))
+    (values #+ccl (ccl:make-external-format :character-encoding enc
+                                            :line-termination lb)
+            #-ccl (guess-encoding pathname)
+            enc lb)))
+  
+@export
+(defun make-external-format (enc lb)
+  "make external format implementation independently."
+  #+ccl (ccl:make-external-format :character-encoding enc
+                                  :line-termination lb)
+  #-ccl enc)
 
 
 @export
-(defun read-text (filepath)
-  (let* ((text)
-		 (enc :utf-8)
-		 (lt :windows))
-	(with-open-file (in
-					 filepath
-					 :direction :input
-					 :external-format enc
-					 :if-does-not-exist nil)
-	  (-read-text in))))
+(defun read-text (pathname)
+"read file as a text. its encoding and line break are guessed automatically.
+this function returns two values:
+
+* first value is an text (list of strings).
+* second value is an cons. its car is encoding and cdr is line break.
+
+# args
+* pathname: pathname of file to read."
+  (multiple-value-bind (ef enc lb)
+      (external-format-from-file pathname)
+    (with-open-file (in
+                     pathname
+                     :direction :input
+                     :external-format ef
+                     :if-does-not-exist nil)
+      (values (-read-text in)
+              (cons enc lb)))))
 
 (defun -read-text (in)
   (if (null in)
@@ -83,19 +118,24 @@ size: vector buffer size"
 			(setf text (cons line text)))))))
 
 @export
-(defun write-text (filepath text)
-  (let* ((enc :utf-8)
-		 (lt :windows))
-	(with-open-file (out
-					 filepath
-					 :direction :output
-					 :external-format enc
-					 :if-exists nil)
-	  (-write-text out text))))
+(defun write-text (pathname text enc lb)
+"write text (list of strings) to text.
+
+# args
+* pathname: pathname of file to read.
+* text: list of strings.
+* enc: encoding.
+* lb: line break."
+  (with-open-file (out
+                   pathname
+                   :direction :output
+                   :external-format (make-external-format enc lb)
+                   :if-exists nil)
+    (-write-text out text)))
 
 (defun -write-text (out text)
   (if (null text)
-	  nil
-	  (progn
-		(write-line (car text) out)
-		(-write-text out (cdr text)))))
+      nil
+      (progn
+        (write-line (car text) out)
+        (-write-text out (cdr text)))))
