@@ -29,8 +29,17 @@
   #+ccl (ccl:save-application *app-name*
 							  :toplevel-function *app-toplevel*
 							  :prepend-kernel t))
-	
+
+(defvar *temp-files*
+  '("t/data/write-text.txt"))
+
 ;; test all
 (defun test ()
-  (cl-test-more:run-test-all))
+  (flet ((clear-temp ()
+           (dolist (f *temp-files*)
+             (if (probe-file f)
+                 (asdf/run-program:run-program (list "rm" f))))))
+    (clear-temp)
+    (cl-test-more:run-test-all)
+    (clear-temp)))
 
