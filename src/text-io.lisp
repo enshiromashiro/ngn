@@ -28,7 +28,7 @@ body: body forms"
 		   (,in ,pathname
 				:direction :input
 				:element-type '(unsigned-byte 8)
-				#+ccl ,@(and enc `(:external-format (make-external-format :character-encoding ,enc))))
+				,@(and enc `(:external-format ,enc)))
 		 (read-sequence ,var ,in))
 	   ,@body)))
 

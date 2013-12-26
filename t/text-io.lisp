@@ -20,12 +20,35 @@
   	   (handler-case 
   		   (progn ,@forms)
   		 (condition (c) 
-  		   (diag (concatenate 'string
-  							  "unexpected condition caused!: "
-  							  (format nil "~a" c)
-  							  )))))))
+  		   (fail "unexpected condition caused!: ~a~%" c))))))
 
 (diag "ngn.text-io test")
+
+
+(deftest-with-handler
+  text-io.guess-encoding
+  (diag "*** for utf-8")
+  (is (ngn.text-io::guess-encoding "t/data/utf8-unix.txt") (guess::utf8-keyword))
+  (is (ngn.text-io::guess-encoding "t/data/utf8-osx.txt") (guess::utf8-keyword))
+  (is (ngn.text-io::guess-encoding "t/data/utf8-dos.txt") (guess::utf8-keyword))
+
+  (diag "*** for euc-jp")
+  (is (ngn.text-io::guess-encoding "t/data/eucjp-unix.txt") (guess::eucj-keyword))
+  (is (ngn.text-io::guess-encoding "t/data/eucjp-osx.txt") (guess::eucj-keyword))
+  (is (ngn.text-io::guess-encoding "t/data/eucjp-dos.txt") (guess::eucj-keyword))
+  
+  (diag "*** for cp932 (sjis)")
+  (is (ngn.text-io::guess-encoding "t/data/sjis-unix.txt") (guess::sjis-keyword))
+  (is (ngn.text-io::guess-encoding "t/data/sjis-dos.txt") (guess::sjis-keyword)))
+
+
+(deftest-with-handler
+  text-io.guess-line-break
+  (diag "*** for utf8")
+  (is (ngn.text-io::guess-line-break "t/data/utf8-unix.txt" (guess::utf8-keyword)) :lf)
+  (is (ngn.text-io::guess-line-break "t/data/utf8-osx.txt" (guess::utf8-keyword)) :cr)
+  (is (ngn.text-io::guess-line-break "t/data/utf8-dos.txt" (guess::utf8-keyword)) :crlf))
+
 
 (deftest-with-handler
   text-io.-read-text
