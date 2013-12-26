@@ -49,15 +49,17 @@
     (format t "~a~%" line)))
 
 
-(defun get-text (filepath description)
-  (if (null filepath)
-      (format t "cannot read ~a: '~a'.~%" description filepath)
-      (let ((text (read-text filepath)))
+(defun get-text (pathname description)
+  "get text data and print message"
+  (if (null pathname)
+      (format t "cannot read ~a: '~a'.~%" description pathname)
+      (multiple-value-bind (text ef)
+          (read-text pathname)
         (if (or (null text) (eq text :does-not-exists))
-            (format t "cannot read ~a: '~a'.~%" description filepath)
+            (format t "cannot read ~a: '~a'.~%" description pathname)
             (progn
-              (format t "~a: '~a'~%" description filepath)
-              text)))))
+              (format t "~a: '~a'~%" description pathname)
+              (values text ef))))))
 
 (defun determine-output-filepath (input-filepath temp-filepath)
   (let ((output-filepath (concatenate 'string
@@ -86,14 +88,14 @@ tag-hook: tags -> tags. hook for extracted tags."
         (dbg `("parsed tags..." ,@tags))
         (if (not (tree-equal tags hooked :test #'equal))
             (dbg `("hooked tags..." ,@hooked)))
-        (generate type hooked temp))))
+        gen)))
 
 @export
 (defun app ()
   "toplevel-function"
   (multiple-value-bind (_ opts args)
       (getopt (cli-options) *cli-short-options* *cli-long-options*)
-    (format t "~a~%" *ngn*)
+    (format t "~%~a~%~%" *ngn*)
 
     (if (member "debug" opts :test #'equal)
         (setf util:*debug* t))
@@ -104,10 +106,14 @@ tag-hook: tags -> tags. hook for extracted tags."
       (if (null template-file)
           (print-usage)
           (handler-case
-              (write-text (determine-output-filepath input-file template-file)
-                          (ngn (get-text input-file "input-file")
-                               (get-text template-file "template-file")
-                               (gen-keyword (pathname-type template-file))))
+              (let ((input (get-text input-file "input-file")))
+                (multiple-value-bind (temp ef)
+                    (get-text template-file "template-file")
+                  (write-text (determine-output-filepath input-file template-file)
+                              (ngn input temp
+                                   (gen-keyword (pathname-type template-file)))
+                              (car ef)
+                              (cdr ef))))
             (condition (c)
               (progn
                 (format t "~%error caused!: ~a~%~%" c)
