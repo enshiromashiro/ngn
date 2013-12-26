@@ -21,12 +21,13 @@
   :depends-on (:cl-ppcre
 			   :cl-annot
 			   :alexandria
-			   :unix-options)
+			   :unix-options
+			   :guess)  ;; https://github.com/t-sin/guess
   :components ((:module "src"
                 :components
                 ((:file "ngn" :depends-on ("generator" "tag-parser" "text-io" "util"))
 				 (:file "tag-parser" :depends-on ("util"))
-				 (:file "text-io")
+				 (:file "text-io" :depends-on ("util"))
 				 (:file "generator" :depends-on ("tag-parser"))
 				 (:file "util"))))
   :description "novel page generator"
