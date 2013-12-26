@@ -19,10 +19,7 @@
   	   (handler-case 
   		   (progn ,@forms)
   		 (condition (c) 
-  		   (diag (concatenate 'string
-  							  "unexpected condition caused!: "
-  							  (format nil "~a" c)
-  							  )))))))
+  		   (fail "unexpected condition caused!: ~a~%" c))))))
 
 (diag "ngn-test")
 
