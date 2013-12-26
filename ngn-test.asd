@@ -10,7 +10,7 @@
 
 (defsystem ngn-test
   :author "subaru45"
-  :license "MIT"
+  :license "NYSL"
   :depends-on (:ngn
 			   :cl-test-more)
   :components ((:module "t"

@@ -15,9 +15,9 @@
 (in-package :ngn-asd)
 
 (defsystem ngn
-  :version "0.6"
+  :version "0.7"
   :author "subaru45"
-  :license "MIT"
+  :license "NYSL"
   :depends-on (:cl-ppcre
 			   :cl-annot
 			   :alexandria

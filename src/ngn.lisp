@@ -42,7 +42,7 @@
     "  print debugging messages."))
 
 (defvar *ngn*
-  "ngn - novel page generator")
+  "ngn - novel page generator v0.7")
 
 (defun print-usage ()
   (dolist (line *usage*)
