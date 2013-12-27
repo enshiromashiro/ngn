@@ -1,5 +1,7 @@
 # Ngn - novel page generator
 
+For more information, in Japanese, see `doc/doc.pdf`
+
 ## Usage
 ngn [target-file] [template-file]
 
