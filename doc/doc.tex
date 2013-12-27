@@ -15,21 +15,31 @@ basicstyle=\scriptsize
 
 \title{ngn -novel page generator-}
 \author{@subaru45}
-\date{2013-11-30}
+\date{2013-12-27}
 \maketitle
 
 
 \section{なんぞや}
-ngn はタグをつけておいたテキストファイルから、そのタグを抽出してテンプレートファイルに埋め込むツールです。
+ngn は簡単なテンプレートエンジンです。
+テキストファイル中のタグ (後述) 文字列で、テンプレートファイル中のタグ部分を置換したファイルを出力します。
+
 開発目的はウェブサイト用の小説・文章ページを自動生成することですが、ほかの用途にも使えなくもないです。
 
-タグ (後述) を付したテキストファイルをテンプレートファイルのタグ部分に埋め込んだファイルを出力します。
-
 出力形式はテンプレートファイルの拡張子で判別します。
-が、現状では html のみです。
-将来的に \TeX をサポートし、さらに、自力で出力形式を追加できるシステムにする予定です。
+が、現状では html 以外はガン無視します。
 
-現在、扱える文字コードは \textbf{utf-8 のみ}です。
+ngn は UTF-8、EUC-JP、SJIS (CP932) の三種類の文字コードを扱うことができます。
+改行コード三種もばっちり扱えます。
+出力ファイルの文字コードと改行コードは、テンプレートファイルの文字コード・改行コードになります。
+つまり \textbf{Windows も Linux も OSX もばっちり} ということです。
+
+
+\subsection{将来的にやること}
+
+\begin{itemize}
+  \item \LaTeX 出力サポート
+  \item 出力形式を自前で追加可能に
+\end{itemize}
 
 \subsection{うんぬん}
 導入の時点でそもそもハードルが高いですが、ngn は NYSL (煮るなり焼くなり好きにしろライセンス)\footnote{http://nysl.com} を採用しています。
@@ -38,10 +48,9 @@ NYSL の元で許される限りにおいて、如何様にも改変し配布し
 
 
 \section{導入}
-ngn の導入には Common Lisp 処理系\footnote{開発は Clozure CL (http://ccl.clozure.com) で行っています。}と quicklisp\footnote{Common Lisp 版 CPAN。http://quicklisp.org/beta}  と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} が既に導入されていることを前提とします。
+ngn の導入には Common Lisp 処理系\footnote{開発は Clozure CL (http://ccl.clozure.com) で行っています。}と quicklisp\footnote{Common Lisp 版 CPAN。http://quicklisp.org/beta} と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} と guess\footnote{文字コード判定ライブラリ。http://github.com/t-sin/guess}が既に導入されていることを前提とします。
 
-実行可能バイナリの生成は shelly を利用しますが、そのため Windowsでは perl5 の導入も必要のようです。
-
+実行可能バイナリの生成は shelly を利用します。
 Windows向けバイナリはいずれ用意します。
 
 導入方法は以下。
@@ -61,7 +70,8 @@ Windows向けバイナリはいずれ用意します。
 \section{つかいかた}
 ngn の使い方を説明します。
 
-まず、出力したいテキストファイル中の文字列にタグを付けます 。タグが付されたテキストファイルを\textbf{タグ付きファイル}と呼びます。
+まず、出力したいテキストファイル中の文字列にタグを付けます。
+タグが付されたテキストファイルを\textbf{タグ付きファイル}と呼びます。
 タグ付きファイルにおいて、あるタグ spam が付けられた文字列を\textbf{spam のテキスト}と呼びます。
 次にテンプレートを用意し、ファイル中に出力したいタグ指定子を記述しておきます。
 最後に、タグ付きファイルとテンプレートを ngn に食わせると、テンプレートのタグ指定子の箇所に、そのタグのテキストが挿入されたファイルができあがります。
