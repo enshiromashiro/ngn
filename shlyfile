@@ -5,8 +5,6 @@
 
 (load "ngn-test.asd")
 (ql:quickload :ngn-test)
-(ql:quickload :cl-test-more)
-
 
 ;; app name
 (defvar *app-name* "ngn")
