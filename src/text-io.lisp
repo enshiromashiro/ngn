@@ -8,7 +8,9 @@
   (:use :cl
         :cl-annot)
   (:import-from :guess
-                :ces-guess-from-vector))
+                :ces-guess-from-vector)
+  (:import-from :util
+                :dbg))
 (in-package :ngn.text-io)
 
 (cl-annot:enable-annot-syntax)
@@ -68,10 +70,9 @@ third balue is type of line break of _pathname_.
 pathname: pathname of the target file"
   (let* ((enc (guess-encoding pathname))
          (lb (guess-line-break pathname enc)))
-    ;; util:dbg is not merged... XD
-    ;; (dbg `(,(format nil "~a" pathname)
-    ;;      (format nil "encoding: ~a" enc)
-    ;; 	    (format nil "line-break: ~a" lb)))
+    (dbg `(,(format nil "file: ~a" pathname)
+            ,(format nil "encoding: ~a" enc)
+            ,(format nil "line-break: ~a" lb)))
     (values #+ccl (ccl:make-external-format :character-encoding enc
                                             :line-termination lb)
             #-ccl (guess-encoding pathname)
