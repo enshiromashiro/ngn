@@ -137,9 +137,7 @@
     (with-output-to-string (strout)
       (with-open-file (in file
                           :direction :input
-                          :external-format (ccl:make-external-format
-                                            :character-encoding :utf-8
-                                            :line-termination :unix))
+                          :external-format (make-external-format :utf-8 :unix))
         (do ((c (read-char in nil nil) (read-char in nil nil))) nil
           (if c
               (write-char c strout)
