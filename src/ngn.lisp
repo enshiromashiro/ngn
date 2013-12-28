@@ -42,7 +42,7 @@
     "  print debugging messages."))
 
 (defvar *ngn*
-  "ngn - novel page generator v0.7")
+  "ngn - novel page generator")
 
 (defun print-usage ()
   (dolist (line *usage*)
@@ -95,7 +95,7 @@ tag-hook: tags -> tags. hook for extracted tags."
   "toplevel-function"
   (multiple-value-bind (_ opts args)
       (getopt (cli-options) *cli-short-options* *cli-long-options*)
-    (format t "~%~a~%~%" *ngn*)
+    (format t "~%~a ~a~%~%" *ngn* (slot-value (asdf:find-system :ngn) 'asdf:version))
 
     (if (member "debug" opts :test #'equal)
         (setf util:*debug* t))
