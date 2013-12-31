@@ -46,24 +46,84 @@ ngn は UTF-8、EUC-JP、SJIS (CP932) の三種類の文字コードを扱うこ
 NYSL の元で許される限りにおいて、如何様にも改変し配布し破棄することができます。
 
 
-
 \section{導入}
-ngn の導入には Common Lisp 処理系\footnote{開発は Clozure CL (http://ccl.clozure.com) で行っています。}と quicklisp\footnote{Common Lisp 版 CPAN。http://quicklisp.org/beta} と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} と guess\footnote{文字コード判定ライブラリ。http://github.com/t-sin/guess}が既に導入されていることを前提とします。
+
+プラットフォームによって導入方法は違います。
+
+\begin{itemize}
+\item Windows 使い\\
+  bitbucket の下記ダウンロードページ \\
+  http://bitbucket.org/subaru45/ngn/downloads \\
+から``win''の文字のついたファイルをダウンロードしてください。後は展開してできたフォルダの ngn.exe をパスの通ったディレクトリに置くなりしてください。
+
+GUI フロントエンドつくったほうがいいかなあ……。\\
+
+\item OSX 使い\\
+  ぼくは Mac 持ってないので、自分でバイナリつくってください。
+  Mac なら App Store に Clozure CL があったと思います\footnote{https://itunes.apple.com/jp/app/clozure-cl/id489900618}。バイナリをつくったらパスの通ったところに置いて使ってください。
+  あるいは wine で win 版動かすとか……。\\
+
+\item *nix 使い\\
+  自分でバイナリつくってください。
+  バイナリをつくったらパスの通ったところに置いて使ってください。
+  あるいは wine で win 版動かすとか……。\\
+
+\end{itemize}
+
+
+\subsection{バイナリをつくるには}
+ngn の導入には Common Lisp 処理系 (開発環境は Clozure CL) と quicklisp\footnote{Common Lisp 版 CPAN のようなもの。http://quicklisp.org/beta} と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} と guess\footnote{文字コード判定ライブラリ。http://github.com/t-sin/guess}が既に導入されていることを前提とします (導入方法は\ref{install-requirements}節参照)。
 
 実行可能バイナリの生成は shelly を利用します。
-Windows向けバイナリはいずれ用意します。
+Windows では shelly がうまく動かない感じ\footnote{cygwin 下で CPAN のライブラリインスコに失敗したので諦めた。Perl わからんぬ。}なので、shelly を使わない方法も書いておきます。
 
-導入方法は以下。
+
+\subsubsection{shelly ありのバイナリづくり}
+
 \begin{enumerate}
   \item ソースの取得 \\
     下記プロジェクトからソースを取得します: \\
-    http://bitbucket.org/subaru45/ngn/
+    http://bitbucket.org/subaru45/ngn \\
 
   \item 実行可能バイナリの作成 \\
-    取得したソースのディレクトリに入り、shly save-app を実行します。
+    取得したソースのディレクトリに入り
+\begin{lstlisting}
+shly save-app
+\end{lstlisting}
+を実行します。
+\end{enumerate}
 
-  \item パスの通ったディレクトリに移動 \\
-    生成されたファイル ngn を /usru/local/bin などパスの通ったディレクトリに移動します。
+\subsubsection{shelly なしのバイナリづくり}
+\begin{enumerate}
+  \item ソースの取得 \\
+    下記プロジェクトからソースを取得します: \\
+    http://bitbucket.org/subaru45/ngn/ \\
+
+  \item 実行可能バイナリの作成
+
+  \begin{enumerate}
+    \item 処理系の起動 \\
+      取得したソースのディレクトリに入り処理系を起動します。
+
+    \item バイナリの作成 \\
+      次のコードを入力します:
+      \begin{lstlisting}
+(load "guessのパス/gues.asd")
+(load "ngn.asd")
+(ql:quickload :ngn)
+(gc)
+(ccl:save-application
+  "ngn"  ;; windowsでは"ngn.exe"
+  :toplevel-function #'ngn:app
+  :prepend-kernel t
+  :purify t)
+      \end{lstlisting}
+      
+      成功なら処理系は自動的に終了します。
+
+    \item ディレクトリに ngn (windows なら ngn.exe) ができていればOK
+
+  \end{enumerate}
 \end{enumerate}
 
 
@@ -175,6 +235,59 @@ ngn の使い方を説明します。
 前2節でサンプルとしたファイルを引数に ngn を実行すると、次のような出力が得られます。
 
 \lstinputlisting[caption=生成されたファイル]{sample/sample.html}
+
+
+\section{導入の導入}
+\label{install-requirements}
+
+Windows 以外のプラットフォームでは導入の敷居が異常に高くて ggrks ではちょっとヒドいので、必要なものの導入方法を書いておきます。
+
+\subsection{Clozure CL の導入}
+
+下記 URL \\
+http://ccl.clozure.com/download.html \\
+から自分のOS・アーキテクチャのアーカイブファイルをダウンロードして、展開してください。
+展開したらそのフォルダにパスを通してください。
+
+以上、導入完了。
+
+末尾が ``cl''になっている (windows では``cl.exe'') ファイルが処理系のインタプリタです。
+以降説明中に「処理系を実行」とか書かれていたらこいつを実行してください コマンドラインで)。
+
+\subsection{quicklisp の導入}
+
+下記のファイル \\
+http://beta.quicklisp.org/quicklisp.lisp \\
+をダウンロードして処理系のフォルダ (Clozure CL なら cclx.y, x と y は何か数字) に置きます。
+コマンドラインで処理系のフォルダに移動したあとインタプリタを起動して、次のようにコード打ちましょう。
+
+\begin{lstlisting}
+(load "quicklisp.lisp")
+
+(quicklisp-quickstart:install :path "./")
+
+(ql:add-to-init-file)
+\end{lstlisting}
+
+以上、導入完了。
+
+
+\subsection{shelly の導入}
+処理系のインタプリタを立ち上げて次のコードを打ちましょう:
+
+\begin{lstlisting}
+(ql:quickload :shelly)
+\end{lstlisting}
+
+以上、導入完了。
+
+
+\subsection{guess の導入}
+下記 URL \\
+http://beta.quicklisp.org/quicklisp.lisp \\
+からソースを一式取得して展開し、処理系のフォルダに展開してできたフォルダごと置いてください。
+
+以上、導入完了。
 
 
 \section{あぺんでぃっくす}
