@@ -22,8 +22,42 @@ basicstyle=\scriptsize
 \section{なんぞや}
 ngn は簡単なテンプレートエンジンです。
 テキストファイル中のタグ (後述) 文字列で、テンプレートファイル中のタグ部分を置換したファイルを出力します。
+つまり……
 
-開発目的はウェブサイト用の小説・文章ページを自動生成することですが、ほかの用途にも使えなくもないです。
+こんなテキストファイル
+\begin{lstlisting}[caption=sample\_text.txt]
+:title タグ付けした文章 ～そのタイトル～
+:author うんこスバル
+:chapter ngnのつかいかた
+
+この文章は無視されます。
+:title タイトル同じタグが複数存在したら先頭にあるものが優先されます
+:body[
+　この文章はサンプルです。
+　この形式のタグは複数行イケます。
+:body]
+\end{lstlisting}
+とこんなテンプレートファイル
+\begin{lstlisting}[caption=template.html]
+<html lang="ja"><head><title>#|title|#</title></head><body>
+<h1>#|title|#</h1>
+著者：#|author|#　章：#|chapter|#　#|spam|#<br>
+#|body|#
+</body></html>
+\end{lstlisting}
+を用意しておいて、$\$ngn sample\_text.txt template.html$とコマンドラインで叩くと
+\begin{lstlisting}[caption=sample\_text.html]
+<html lang="ja"><head><title>タグ付けした文章 ～そのタイトル～</title></head><body>
+<h1>タグ付けした文章 ～そのタイトル～</h1>
+著者：うんこスバル　章：ngnのつかいかた　<br>
+　この文章はサンプルです。<br>
+　この形式のタグは複数行イケます。<br>
+</body></html>
+\end{lstlisting}
+ってな内容のファイル sample\_text.html を出力してくれるツールです。
+
+
+開発目的はウェブサイトの小説・文章ページを自動生成することですが、ほかの用途にも使えなくもないです。
 
 出力形式はテンプレートファイルの拡張子で判別します。
 が、現状では html 以外はガン無視します。
@@ -284,7 +318,7 @@ http://beta.quicklisp.org/quicklisp.lisp \\
 
 \subsection{guess の導入}
 下記 URL \\
-http://beta.quicklisp.org/quicklisp.lisp \\
+https://github.com/t-sin/guess \\
 からソースを一式取得して展開し、処理系のフォルダに展開してできたフォルダごと置いてください。
 
 以上、導入完了。
