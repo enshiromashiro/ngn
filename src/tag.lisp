@@ -87,7 +87,7 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
          for parsed = (parse-line line) then (parse-line line)
          finally (push-lines)
          do (etypecase parsed
-              (nil nil)
+              (null nil)
               (cons (flet ((tag-eq (type)
                              (eq type (car parsed))))
                       (push-lines)
