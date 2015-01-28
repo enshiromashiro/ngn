@@ -69,20 +69,18 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
       (:ngn-tag (parse-tag line))
       (:ngn-error-too-short (error "invalid ngn syntax")))))
 
-(defun set-tag (tag data hash)
-  (setf (gethash (make-symbol (string-upcase (svref (cdr tag) 0))) hash) data))
 
-
+@export
 (defun parse (stream)
   (let ((hash (make-hash-table))
         (lines)
         (tag))
-    (flet* ((set-tag (tag lines)
-                     (setf (gethash (make-symbol (string-upcase (svref (cdr tag) 0)))
-                            hash) lines))
-           (push-lines ()
-             (unless (or (null lines) (null tag))
-               (set-tag tag (nreverse lines)))))
+    (labels ((set-tag (tag lines)
+               (setf (gethash (make-symbol (string-upcase (svref (cdr tag) 0)))
+                              hash) lines))
+             (push-lines ()
+               (unless (or (null lines) (null tag))
+                 (set-tag tag (nreverse lines)))))
       (loop
          for line = (read-line stream nil :eof) then (read-line stream nil :eof)
          until (eq line :eof)
