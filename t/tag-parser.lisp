@@ -13,6 +13,35 @@
 
 (plan nil)
 
+
+;;; determine-line-type
+(deftest 'determine-line-type
+  (is (determine-line-type "") :plain)
+
+  (is (determine-line-type ":") :ngn-error-too-short)
+  (is (determine-line-type "::not tag") :ngn-escape-tag)
+  (is (determine-line-type ":;not comment") :ngn-escape-comment)
+  (is (determine-line-type ":tag-name") :ngn-tag)
+
+  (is (determine-line-type ";") :ngn-comment)
+  (is (determine-line-type ";str") :ngn-comment)
+
+  (is (determine-line-type "str") :plain))
+
+
+(deftest 'determine-line-type
+  (is (determine-tag-type ":tag") :block)
+  (is (determine-tag-type ":tag ") :oneline) ; *invalid*
+  (is (determine-tag-type ":tag data") :oneline)
+  (is (determine-tag-type "::") dummy) ; *invalid*
+  (is (determine-tag-type ":tag:") dummy)
+
+  ;; for unexpected args
+  (is (determine-tag-type ":") :dummy)
+  (is (determine-tag-type ":;not-tag") block)
+  (is (determine-tag-type "::not-tag") block))
+
+
 (eval-when (:load-toplevel :compile-toplevel :execute)
   (defmacro deftest-with-handler (test-name &rest forms)
     `(deftest ,test-name

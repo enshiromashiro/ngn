@@ -5,7 +5,8 @@
 
 (in-package :cl-user)
 (defpackage ngn.tag-parser
-  (:use :cl)
+  (:use :cl
+        :cl-annot)
   (:import-from :alexandria
                 :emptyp)
   (:import-from :cl-ppcre
@@ -14,10 +15,9 @@
                 :gen-keyword))
 (in-package :ngn.tag-parser)
 
-(cl-annot:enable-annot-syntax)
+(enable-annot-syntax)
 
 
-(defconstant +tag-block-delimiter-start+ #\[)
 (defconstant +tag-block-delimiter-end+ #\])
 
 (defconstant +tag-identifer-valid-chars+ "[a-z0-9-]")
