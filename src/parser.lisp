@@ -4,12 +4,12 @@
 |#
 
 (in-package :cl-user)
-(defpackage ngn.tag
+(defpackage ngn.parser
   (:use :cl
         :cl-annot)
   (:import-from :cl-ppcre
                 :scan-to-strings))
-(in-package :ngn.tag)
+(in-package :ngn.parser)
 
 (enable-annot-syntax)
 
@@ -100,4 +100,5 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
               (string (when (and (not (null tag)) (eq :block (car tag)))
                         (push parsed lines)))))
       hash)))
+
 
