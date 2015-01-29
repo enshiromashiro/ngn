@@ -70,6 +70,19 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
       (:ngn-error-too-short (error "invalid ngn syntax")))))
 
 
+(defun trim-empty-lines (lines)
+  "Trim empty lines from head and tail of _lines_.
+If _lines_ is nil, then returns nil."
+  (flet ((not-empty-position (lines from-end-p)
+             (position "" lines
+                       :test-not #'equal
+                       :from-end from-end-p)))
+    (let ((begin (not-empty-position lines nil))
+          (end (not-empty-position lines t)))
+      (cond ((and (null begin) (null end)) nil)
+            ((and (eq begin 0) (eq end (1- (length lines)))) lines)
+            (t (subseq lines begin (1+ end)))))))
+
 @export
 (defun parse (stream)
   (let ((hash (make-hash-table))
