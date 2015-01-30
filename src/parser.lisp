@@ -93,7 +93,7 @@ If _lines_ is nil, then returns nil."
                               hash) lines))
              (push-lines ()
                (unless (or (null lines) (null tag))
-                 (set-tag tag (nreverse lines)))))
+                 (set-tag tag (trim-empty-lines (nreverse lines))))))
       (loop
          for line = (read-line stream nil :eof) then (read-line stream nil :eof)
          until (eq line :eof)
