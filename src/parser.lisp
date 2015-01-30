@@ -85,6 +85,84 @@ If _lines_ is nil, then returns nil."
 
 @export
 (defun parse (stream)
+  "Parse the ngn-syntax text lines from input stream _stream_.
+The ngn-syntax are mainly consist of three elements.
+
+The elements are __tag__, __comment__ and __plain text__.
+And ngn-syntax has two escape sequences.
+
+## Tag
+__Tag__ is mainly concept of ngn.
+It is a name of data following the __tag__.
+
+__Tag__ begins with colon (':') only at line head.
+Tag-name, is called _tag-identifier_, must be consist of
+lower alphabets (a-z), digits (0-9) and hyphen (-).
+
+There are three kind of __tag__, those are __oneline__, __block__ and __dummy__
+
+### Oneline Tag
+__Oneline tag__ is used naming _one-line_ data, for example,
+title, author's name, date and other __short__ text data.
+
+Syntax is below:
+
+    :[tag-identifier] [data]
+
+Note that oneline-tag needs only one space after tag-identifier.
+If two spaces after tag-identifier, the second space is included data.
+
+### Block Tag
+__Block tag__ is used naming _multi-line_ data, for example,
+article, novel, postscript and other __long__ text data.
+The end of __block tag__ is appearance of next tag or EOF.
+
+Note that empty lines an head and tail of text data, will _trim_.
+
+Syntax is below:
+
+    :[tag-identifier]
+    line1...
+    line2...
+    ...
+
+### Dummy Tag
+__Dummy tag__ is used hiding following text data (ex. memo) or
+forcing end previous __block tag__.
+
+Syntax is below:
+
+    :[tag-identifier]:
+    line1...
+    line2...
+    ...
+
+## Comment
+__Comment__ is used describing comment in __block__ data.
+
+Syntax is below:
+
+    ;[comment-string]
+
+## Escape sequence
+If you want to write ':' or ';' at head of line,
+use below escape sequences:
+
+### for colon (:)
+    ::[string]
+
+is read as
+
+    :[string]
+
+### for semicolon (;)
+    :;[string]
+
+is read as
+
+    ;[string]
+
+"
   (let ((hash (make-hash-table))
         (lines)
         (tag))
