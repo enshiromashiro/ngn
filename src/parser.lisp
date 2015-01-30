@@ -89,7 +89,7 @@ If _lines_ is nil, then returns nil."
         (lines)
         (tag))
     (labels ((set-tag (tag lines)
-               (setf (gethash (make-symbol (string-upcase (svref (cdr tag) 0)))
+               (setf (gethash (intern (string-upcase (svref (cdr tag) 0)))
                               hash) lines))
              (push-lines ()
                (unless (or (null lines) (null tag))
