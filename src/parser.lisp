@@ -171,7 +171,10 @@ is read as
                               hash) lines))
              (push-lines ()
                (unless (or (null lines) (null tag))
-                 (set-tag tag (trim-empty-lines (nreverse lines))))))
+                 (set-tag tag
+                          (reduce (lambda (a b)
+                                    (concatenate 'string b (string #\newline) a))
+                                  (trim-empty-lines lines))))))
       (loop
          for line = (read-line stream nil :eof) then (read-line stream nil :eof)
          until (eq line :eof)
