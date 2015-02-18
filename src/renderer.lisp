@@ -4,7 +4,7 @@
 |#
 
 (in-package :cl-user)
-(defpackage ngn.generator
+(defpackage ngn.renderer
   (:use :cl
         :cl-annot)
   (:import-from :ngn.render-dsl
@@ -14,7 +14,7 @@
                 :scan)
   (:import-from :inquisitor
                 :detect-external-format))
-(in-package :ngn.generator)
+(in-package :ngn.renderer)
 
 (cl-annot:enable-annot-syntax)
 
