@@ -65,6 +65,6 @@ _tag_ is a hashtable. _tmppath_ is a pathname.
   (let ((ef (detect-external-format tmppath :jp)))
     (with-open-file (in-stream tmppath
                      :direction :input
-                     :external-format ef :jp)
-      (embed-into-template (eval-tags tags (make-renderer-path))
+                     :external-format ef)
+      (embed-into-template (eval-tags tags (make-renderer-path tmppath))
                            in-stream out-stream))))
