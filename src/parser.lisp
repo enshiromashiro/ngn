@@ -14,8 +14,8 @@
 (enable-annot-syntax)
 
 
-(defvar *ngn-tag-char* #\:)
-(defvar *ngn-comment-char* #\;)
+(defconstant +ngn-tag-char+ #\:)
+(defconstant +ngn-comment-char+ #\;)
 
 (defvar *ngn-identifier* "([a-z0-9-]+)")
 (defvar *ngn-tag-block*
@@ -25,21 +25,24 @@
 (defvar *ngn-tag-dummy*
   (concatenate 'string "^:" *ngn-identifier* ":$"))
 
+
 (defun determine-line-type (line)
   "Determine a type of line"
   (let ((len (length line)))
     (if (eq len 0)
         :plain
-        (case (char line 0)
-          (#.*ngn-tag-char*
-           (if (eq len 1)
-               :ngn-error-too-short
-               (case (char line 1)
-                 (#.*ngn-comment-char* :ngn-escape-comment)
-                 (#.*ngn-tag-char* :ngn-escape-tag)
-                 (otherwise :ngn-tag))))
-          (#.*ngn-comment-char* :ngn-comment)
-          (otherwise :plain)))))
+        (let ((ch0 (char line 0)))
+          (cond
+            ((eq ch0 +ngn-tag-char+)
+             (if (eq len 1)
+                 :ngn-error-too-short
+                 (let ((ch1 (char line 1)))
+                   (cond
+                     ((eq ch1 +ngn-comment-char+) :ngn-escape-comment)
+                     ((eq ch1 +ngn-tag-char+) :ngn-escape-tag)
+                     (t :ngn-tag)))))
+             ((eq ch0 +ngn-comment-char+) :ngn-comment)
+             (t :plain))))))
 
 (defun scan-tag (regex line)
   (multiple-value-bind (_ tag)
@@ -60,8 +63,8 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
           (t (error "invalid ngn syntax")))))
 
 (defun parse-line (line)
-  (let ((type (determine-line-type line)))
-    (ecase type
+  (let ((line-type (determine-line-type line)))
+    (ecase line-type
       (:plain line)
       (:ngn-comment nil)
       (:ngn-escape-comment (concatenate 'string ";" (subseq line 2)))
