@@ -2,9 +2,13 @@
 ;;;; In this file, you can use functions and macros in CL-USER package
 
 
+(require :cl-ppcre)
+
 ;; per-line rendering
 (defun render-per-line (line)
-  (format nil "~a<br>" line))
+  (if (ppcre:scan "^#+ " line)
+      line
+      (format nil "~a<br>" line)))
 
 ;; ruby rendering
 (defun render-ruby (text ruby)
