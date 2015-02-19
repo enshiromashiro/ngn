@@ -153,8 +153,7 @@
 @export
 (defun eval-tags (tags renderer-path)
   (let ((*package* (find-package :ngn.render-dsl)))
-    (require (intern (string-upcase (pathname-name renderer-path)))
-             renderer-path))
+    (load renderer-path))
   (let ((new-tags (make-hash-table)))  
     (maphash (lambda (k v) (setf (gethash k new-tags) (render-tag v)))
              tags)
