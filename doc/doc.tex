@@ -15,68 +15,194 @@ basicstyle=\scriptsize
 
 \title{ngn -novel page generator-}
 \author{@subaru45}
-\date{2013-12-27}
+\date{2015-02-22}
 \maketitle
 
 
-\section{なんぞや}
-ngn は簡単なテンプレートエンジンです。
-テキストファイル中のタグ (後述) 文字列で、テンプレートファイル中のタグ部分を置換したファイルを出力します。
-つまり……
+\section{概要}
 
-こんなテキストファイル
-\begin{lstlisting}[caption=sample\_text.txt]
-:title タグ付けした文章 ～そのタイトル～
-:author うんこスバル
-:chapter ngnのつかいかた
+\subsection{ngnってなんぞや}
+ngnはテキストファイルとテンプレートから、HTMLファイルやpixiv小説形式のテキストファイルを生成する、簡単なテンプレートエンジンです。
+テキストファイル中の部分に名前を付け（タグ付け）、タグ付けした部分をテンプレートファイル中に埋め込むことができます。
+
+またngn独自の記法を用いてルビや太字、見出しや引用を最終的な形式（HTML、pixiv形式、などなど……）に依存しない形で記述しておき、テンプレートへの埋め込み時に最終的な形式での記法に変換することができます。
+
+言葉ではわかりにくいと思うので、後に例を出します。
+
+
+\subsection{だれ向けなのか}
+
+一つのテキストファイルから、複数の形式にテンプレートを使って書き出したい人向けです。
+
+たとえば、書いた小説データからウェブサイト用のHTML、pixiv用のテキストデータなどをコピペを駆使してつくって「めんどくせー！！」と思っている人には向いています。
+あるいは、書き終わってから形式が決まる——最初からフォーマットが決まっていないという人にも向いているかもしれません。
+
+逆に、常に一つの形式しか利用しない人、つまり、pixivにしか投稿しないので小説データにpixiv形式をベタ書きしている人などには、メリットがありません。
+
+
+\subsection{利用例}
+
+
+利用例を出します。
+下記に示すように、ngn形式でテキストファイルを書いたとします。
+
+\begin{lstlisting}[caption=sample.txt]
+:title ngnについて
+:author スバル
+:description これは一行タグです
 
 この文章は無視されます。
-:title タイトル同じタグが複数存在したら先頭にあるものが優先されます
-:body[
-　この文章はサンプルです。
-　この形式のタグは複数行イケます。
-:body]
-\end{lstlisting}
-とこんなテンプレートファイル
-\begin{lstlisting}[caption=template.html]
-<html lang="ja"><head><title>#|title|#</title></head><body>
-<h1>#|title|#</h1>
-著者：#|author|#　章：#|chapter|#　#|spam|#<br>
-#|body|#
-</body></html>
-\end{lstlisting}
-を用意しておいて、$\$ngn sample\_text.txt template.html$とコマンドラインで叩くと
-\begin{lstlisting}[caption=sample\_text.html]
-<html lang="ja"><head><title>タグ付けした文章 ～そのタイトル～</title></head><body>
-<h1>タグ付けした文章 ～そのタイトル～</h1>
-著者：うんこスバル　章：ngnのつかいかた　<br>
-　この文章はサンプルです。<br>
-　この形式のタグは複数行イケます。<br>
-</body></html>
-\end{lstlisting}
-ってな内容のファイル sample\_text.html を出力してくれるツールです。
 
+:body
+
+# 概要
+
+　このテキストファイルはngn記法で書かれています。
+　ngn記法では、#rb(読み)(ルビ)、#em(強調)（傍点を想定）、#bd(太字)、#it(斜字)、#bi(太字かつ斜字)、#ul(下線)を表現することができます
+
+## 他の記法
+
+　上記の他に、見出し（もう使っています）と、引用（これから使います）を使うことができます。
+
+>"　初めに、神は天地を創造された。
+　地は混沌であって、闇が深遠の#rb(面)(おもて)にあり、神の霊が水の面を動いていた。
+　神は言われた。「光あれ。」こうして、光があった。"
+
+#it(旧約聖書 創世記 第1章 第1節〜第31節),
+http://www12.ocn.ne.jp/~sokkidou/sokkig_01/0101_0131.html
+
+; 行頭セミコロンはコメントです。この行と下の行は無視されます。
+; なお、ngn記法で半角の括弧を利用しているため、
+; 半角括弧の使用は避けたほうが良いです。
+
+:memo:
+
+これはメモなどを書く記法です。
+
+:duplicate 同じタグが複数存在したら一番後ろにあるものが優先されます
+:duplicate 重複タグ
+
+\end{lstlisting}
+
+また、テンプレートとして次のようなファイルを用意しておきます。
+
+\begin{lstlisting}[caption=template.html]
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>#|title|#</title>
+<style type="text/css">
+.emphasis {
+  -webkit-text-emphasis: filled dot black;
+  text-emphasis: filled dot black;
+}
+.bold {
+  font-weight: bold;
+}
+.italic {
+  font-style: italic;
+}
+.bold-italic {
+  font-weight: bold;
+  font-style: italic;
+}
+.underline {
+  text-decoration: underline;
+}
+.quote1 {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+<h1>#|title|#</h1>
+author: #|author|#<br>
+
+#|body|#
+<br>
+descriptionタグの内容: #|description|#<br>
+重複タグの内容: #|duplicate|#<br>
+
+</body>
+</html>
+\end{lstlisting}
+
+ここでコマンドラインで（ウィンドウで操作できるようにする予定です） $\$ngn template.html sample.txt output.html$ と叩くと、こんなファイルができあがります。
+
+\begin{lstlisting}[caption=output.html]
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ngnについて</title>
+<style type="text/css">
+.emphasis {
+  -webkit-text-emphasis: filled dot black;
+  text-emphasis: filled dot black;
+}
+.bold {
+  font-weight: bold;
+}
+.italic {
+  font-style: italic;
+}
+.bold-italic {
+  font-weight: bold;
+  font-style: italic;
+}
+.underline {
+  text-decoration: underline;
+}
+.quote1 {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+<h1>ngnについて</h1>
+author: スバル<br>
+
+<h2 class="header1">概要</h2>
+<br>
+　このテキストファイルはngn記法で書かれています。<br>
+　ngn記法では、<ruby>読み<rp>（</rp><rt>ルビ</rt><rp>）</rp></ruby>、<span class="emphasis">強調</span>（傍点を想定）、<span class="bold">太字</span>、<span class="italic">斜字</span>、<span class="bold-italic">太字かつ斜字</span>、<span class="underline">下線</span>を表現することができます<br>
+<br>
+<h2 class="header2">他の記法</h2>
+<br>
+　上記の他に、見出し（もう使っています）と、引用（これから使います）を使うことができます。<br>
+<br>
+<p class="quote1">
+　初めに、神は天地を創造された。<br>
+　地は混沌であって、闇が深遠の<ruby>面<rp>（</rp><rt>おもて</rt><rp>）</rp></ruby>にあり、神の霊が水の面を動いていた。<br>
+　神は言われた。「光あれ。」こうして、光があった。
+</p>
+<br>
+<span class="italic">旧約聖書 創世記 第1章 第1節〜第31節</span>,<br>
+http://www12.ocn.ne.jp/~sokkidou/sokkig_01/0101_0131.html<br>
+
+<br>
+descriptionタグの内容: これは一行タグです<br>
+重複タグの内容: 重複タグ<br>
+
+</body>
+</html>
+\end{lstlisting}
+
+とまあ、こんなツールです。
+
+
+\subsection{その他}
 
 開発目的はウェブサイトの小説・文章ページを自動生成することですが、ほかの用途にも使えなくもないです。
 
 出力形式はテンプレートファイルの拡張子で判別します。
-が、現状では html 以外はガン無視します。
+これは独自に追加可能ですが、Common Lispの知識が必要です。
+subaru45まで要望を寄せていだだければ、対応するかもしれません。
 
-ngn は UTF-8、EUC-JP、SJIS (CP932) の三種類の文字コードを扱うことができます。
-改行コード三種もばっちり扱えます。
-出力ファイルの文字コードと改行コードは、テンプレートファイルの文字コード・改行コードになります。
-つまり \textbf{Windows も Linux も OSX もばっちり} ということです。
-
-
-\subsection{将来的にやること}
-
-\begin{itemize}
-  \item \LaTeX 出力サポート
-  \item 出力形式を自前で追加可能に
-\end{itemize}
-
-\subsection{うんぬん}
-導入の時点でそもそもハードルが高いですが、ngn は NYSL (煮るなり焼くなり好きにしろライセンス)\footnote{http://nysl.com} を採用しています。
+ngn は NYSL (煮るなり焼くなり好きにしろライセンス)\footnote{http://nysl.com} を採用しています。
 NYSL の元で許される限りにおいて、如何様にも改変し配布し破棄することができます。
 
 
@@ -85,80 +211,20 @@ NYSL の元で許される限りにおいて、如何様にも改変し配布し
 プラットフォームによって導入方法は違います。
 
 \begin{itemize}
-\item Windows 使い\\
+\item Windows ユーザへ\\
   bitbucket の下記ダウンロードページ \\
   http://bitbucket.org/subaru45/ngn/downloads \\
-から``win''の文字のついたファイルをダウンロードしてください。後は展開してできたフォルダの ngn.exe をパスの通ったディレクトリに置くなりしてください。
+から``win''の文字のついた一番新しいバージョンのファイルをダウンロードして、好きな場所に解凍してください。\\
+  ウィンドウで操作できるようにする予定なので、少々おまちください。\\
 
-GUI フロントエンドつくったほうがいいかなあ……。\\
+\item OSX ユーザへ\\
+  作者はMacを持っていないので、バイナリの提供ができません。Wineでなんとかならないかなあ。
 
-\item OSX 使い\\
-  ぼくは Mac 持ってないので、自分でバイナリつくってください。
-  Mac なら App Store に Clozure CL があったと思います\footnote{https://itunes.apple.com/jp/app/clozure-cl/id489900618}。バイナリをつくったらパスの通ったところに置いて使ってください。
-  あるいは wine で win 版動かすとか……。\\
-
-\item *nix 使い\\
-  自分でバイナリつくってください。
-  バイナリをつくったらパスの通ったところに置いて使ってください。
-  あるいは wine で win 版動かすとか……。\\
+\item *nix ユーザへ\\
+  Ubuntu版バイナリなら提供できますが、そもそもいるのだろうか……。
 
 \end{itemize}
 
-
-\subsection{バイナリをつくるには}
-ngn の導入には Common Lisp 処理系 (開発環境は Clozure CL) と quicklisp\footnote{Common Lisp 版 CPAN のようなもの。http://quicklisp.org/beta} と shelly\footnote{シェルからCommon Lispのコードをさくっと実行できるユーティリティ。http://github.com/fukamachi/shelly} と guess\footnote{文字コード判定ライブラリ。http://github.com/t-sin/guess}が既に導入されていることを前提とします (導入方法は\ref{install-requirements}節参照)。
-
-実行可能バイナリの生成は shelly を利用します。
-Windows では shelly がうまく動かない感じ\footnote{cygwin 下で CPAN のライブラリインスコに失敗したので諦めた。Perl わからんぬ。}なので、shelly を使わない方法も書いておきます。
-
-
-\subsubsection{shelly ありのバイナリづくり}
-
-\begin{enumerate}
-  \item ソースの取得 \\
-    下記プロジェクトからソースを取得します: \\
-    http://bitbucket.org/subaru45/ngn \\
-
-  \item 実行可能バイナリの作成 \\
-    取得したソースのディレクトリに入り
-\begin{lstlisting}
-shly save-app
-\end{lstlisting}
-を実行します。
-\end{enumerate}
-
-\subsubsection{shelly なしのバイナリづくり}
-\begin{enumerate}
-  \item ソースの取得 \\
-    下記プロジェクトからソースを取得します: \\
-    http://bitbucket.org/subaru45/ngn/ \\
-
-  \item 実行可能バイナリの作成
-
-  \begin{enumerate}
-    \item 処理系の起動 \\
-      取得したソースのディレクトリに入り処理系を起動します。
-
-    \item バイナリの作成 \\
-      次のコードを入力します:
-      \begin{lstlisting}
-(load "guessのパス/gues.asd")
-(load "ngn.asd")
-(ql:quickload :ngn)
-(gc)
-(ccl:save-application
-  "ngn"  ;; windowsでは"ngn.exe"
-  :toplevel-function #'ngn:app
-  :prepend-kernel t
-  :purify t)
-      \end{lstlisting}
-      
-      成功なら処理系は自動的に終了します。
-
-    \item ディレクトリに ngn (windows なら ngn.exe) ができていればOK
-
-  \end{enumerate}
-\end{enumerate}
 
 
 \section{つかいかた}
@@ -269,150 +335,6 @@ ngn の使い方を説明します。
 前2節でサンプルとしたファイルを引数に ngn を実行すると、次のような出力が得られます。
 
 \lstinputlisting[caption=生成されたファイル]{sample/sample.html}
-
-
-\section{導入の導入}
-\label{install-requirements}
-
-Windows 以外のプラットフォームでは導入の敷居が異常に高くて ggrks ではちょっとヒドいので、必要なものの導入方法を書いておきます。
-
-\subsection{Clozure CL の導入}
-
-下記 URL \\
-http://ccl.clozure.com/download.html \\
-から自分のOS・アーキテクチャのアーカイブファイルをダウンロードして、展開してください。
-展開したらそのフォルダにパスを通してください。
-
-以上、導入完了。
-
-末尾が ``cl''になっている (windows では``cl.exe'') ファイルが処理系のインタプリタです。
-以降説明中に「処理系を実行」とか書かれていたらこいつを実行してください コマンドラインで)。
-
-\subsection{quicklisp の導入}
-
-下記のファイル \\
-http://beta.quicklisp.org/quicklisp.lisp \\
-をダウンロードして処理系のフォルダ (Clozure CL なら cclx.y, x と y は何か数字) に置きます。
-コマンドラインで処理系のフォルダに移動したあとインタプリタを起動して、次のようにコード打ちましょう。
-
-\begin{lstlisting}
-(load "quicklisp.lisp")
-
-(quicklisp-quickstart:install :path "./")
-
-(ql:add-to-init-file)
-\end{lstlisting}
-
-以上、導入完了。
-
-
-\subsection{shelly の導入}
-処理系のインタプリタを立ち上げて次のコードを打ちましょう:
-
-\begin{lstlisting}
-(ql:quickload :shelly)
-\end{lstlisting}
-
-以上、導入完了。
-
-
-\subsection{guess の導入}
-下記 URL \\
-https://github.com/t-sin/guess \\
-からソースを一式取得して展開し、処理系のフォルダに展開してできたフォルダごと置いてください。
-
-以上、導入完了。
-
-
-\section{あぺんでぃっくす}
-開発者向けな情報。
-あるいは仕様メモ。
-自分用。
-
-
-\subsection{タグ付きテキストファイルの仕様}
-
-タグ付きテキストファイルの仕様を示します。
-<oneline-tag> と <block-tag> の部分が重要です。
-
-\begin{lstlisting}[caption=タグ付きテキストファイル]
-<text> ::= <line>*
-<line> ::= <oneline-tag> | <block-tag> | <plain-line>
-
-<oneline-tag> ::= <tag-delimiter> <tag-identifer> <space> <data> <eol>
-
-<block-tag> ::= <block-tag-open> <plain-line>* <block-tag-close>
-<block-tag-open> ::= <tag-delimiter> <tag-identifer> <block-delimimter-open> <eol>
-<block-tag-close> ::= <tag-delimiter> <tag-identifer> <block-delimimter-close> <eol>
-  
-<tag-identifer> ::= a-z0-9- (lower alphabets, numerics and hyphen)  
-<tag-delimiter> ::= :
-<block-delimiter-open> ::= [
-<block-delimiter-close> ::= ]
-
-<plain-line> ::= .* <eol> (any strings s.t. ending with <eol>)  
-<eol> ::= \n
-\end{lstlisting}
-
-
-\subsection{タグについてのフック}
-ngn をさらに拡張する人向けの情報です。
-
-ngn では、抽出したタグをテンプレートに挿入する前に、抽出したタグに対してフック関数を実行するようになっています。
-これにより、抽出されたタグの中にさらに別の DSL が記述されている場合、それに処理を施してから、出力を行うことができます。
-
-たとえば、タグのデータ内に Markdown などの 言語を埋め込んでおき、タグ抽出後にそれらを出力前に処理してしまうといった用途に使えます。
-
-フック関数は ngn のメイン処理を行っている /src/ngn.lisp のngn:ngn 関数のキーワード引数 tag-hook に渡してください。
-tag-hook はタグのリストを受け取り、タグのリストを返すように記述してください。
-
-/* 
-あ。ngn.generator を外部ファイルで拡張可能にするわけだし、このフックは実はいらない気がしてきた。
-いらないよなあ……。
-あとで消えるかも。
- */
-
-出力形式に依らない変換を行うのに用いてください。
-たとえば、
-\begin{lstlisting}
-(times 10 コワイ)
-\end{lstlisting}
-を
-\begin{lstlisting}
-コワイコワイコワイコワイコワイコワイコワイコワイコワイコワイ
-\end{lstlisting}
-に展開するとか、
-\begin{lstlisting}
-(times 5 (random-pickup "死シし" "ぬヌ") (nl))
-\end{lstlisting}
-を
-\begin{lstlisting}
-シヌ
-死ぬ
-シぬ
-しぬ
-しヌ
-\end{lstlisting}
-に展開するとか(nlはnew line)、そういう使い方。
-今のところ必要性は全くないけど。
-
-
-\subsubsection{タグのデータ構造}
-タグのデータ構造です。
-この構造を保つよう tag-hook を書いてください。
-
-\begin{lstlisting}[caption=タグのデータ構造]
-<tags> ::= ( <tag>* )
-<tag> ::= ( <oneline> | <block> )
-
-<oneline> ::= <tag-identifer> <string>
-<block> ::= <tag-identifer> <string-list>
-
-<string-list> ::= ( <string>*)
-<string> ::= Common Lisp の文字列
-<tag-identifer> ::= Common Lisp のキーワード
-
-\end{lstlisting}
 
 
 \end{document}
