@@ -111,17 +111,15 @@
       (with-level (lev str #\> stream)
         (if (< lev +render-quote-level-max+)
             (if (eq (read-char stream) #\")
-                (prog1
-                    (render-quote
-                     (with-output-to-string (out)
-                       (loop
-                          for c = (read-char stream)
-                          until (eq c #\")
-                          do (case c
-                               (#\# (write-string (sharp-reader stream nil) out))
-                               (otherwise (write-char c out)))))
-                     (1+ lev))
-                  (read-char stream nil))
+                (render-quote
+                 (with-output-to-string (out)
+                   (loop
+                      for c = (read-char stream)
+                      until (eq c #\")
+                      do (case c
+                           (#\# (write-string (sharp-reader stream nil) out))
+                           (otherwise (write-char c out)))))
+                 (1+ lev))
                 (format nil "~a\"" str))
             (format nil ">~a" str)))
       ">"))
