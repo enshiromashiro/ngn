@@ -15,21 +15,21 @@
 (in-package :ngn-asd)
 
 (defsystem ngn
-  :version "0.7.1"
+  :version "0.9.0"
   :author "subaru45"
   :license "NYSL"
   :depends-on (:cl-ppcre
-			   :cl-annot
-			   :alexandria
-			   :unix-options
-			   :guess)  ;; https://github.com/t-sin/guess
+               :cl-annot
+               :alexandria
+               :inquisitor
+               :trivial-shell
+               :unix-options)
   :components ((:module "src"
                 :components
-                ((:file "ngn" :depends-on ("generator" "tag-parser" "text-io" "util"))
-				 (:file "tag-parser" :depends-on ("util"))
-				 (:file "text-io" :depends-on ("util"))
-				 (:file "generator" :depends-on ("tag-parser"))
-				 (:file "util"))))
+                ((:file "parser")
+                 (:file "render-dsl")
+                 (:file "renderer" :depends-on ("render-dsl"))
+                 (:file "ngn" :depends-on ("parser" "renderer")))))
   :description "novel page generator"
   :long-description
   #.(with-open-file (stream (merge-pathnames
