@@ -1,26 +1,40 @@
 <html lang="ja">
-
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>- #|title|# -</title>
-
+<title>#|title|#</title>
 <style type="text/css">
+.emphasis {
+  -webkit-text-emphasis: filled dot black;
+  text-emphasis: filled dot black;
+}
+.bold {
+  font-weight: bold;
+}
+.italic {
+  font-style: italic;
+}
+.bold-italic {
+  font-weight: bold;
+  font-style: italic;
+}
+.underline {
+  text-decoration: underline;
+}
+.quote1 {
+  margin-left: 2em;
+}
 </style>
 
 </head>
 
 <body>
-<h1> #|title|# </h1>
-<section id="author">
-<h2>#|author|#</h2>
-<br>
-#|description|#
-</section>
+<h1>#|title|#</h1>
+author: #|author|#<br>
 
-<section id="body">
 #|body|#
-</section>
+<br>
+descriptionタグの内容: #|description|#<br>
+重複タグの内容: #|duplicate|#<br>
 
 </body>
-
 </html>
