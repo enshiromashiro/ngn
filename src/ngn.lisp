@@ -117,6 +117,7 @@ Options:~%~@{~a~%~}~%")
                                            (detect-external-format (pathname (second free)) :jp))
                             (with-open-file (outstream (third free)
                                              :direction :output
+                                             :if-exists :supersede
                                              :external-format ef)
                               (ngn tmpstream instream outstream)))))))
                (condition (c)
