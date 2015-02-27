@@ -1,4 +1,4 @@
-# Ngn - novel page generator
+# ngn - novel page generator
 
 For more information, in Japanese, see `doc/doc.pdf`
 
