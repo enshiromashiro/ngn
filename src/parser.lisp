@@ -180,7 +180,9 @@ is read as
          for line = (read-line stream nil :eof) then (read-line stream nil :eof)
          until (eq line :eof)
          for parsed = (parse-line line) then (parse-line line)
-         finally (push-lines)
+         finally (when (and (not (null tag)) (eq :block (car tag)))
+                   (push "" lines))
+                 (push-lines)
          do (etypecase parsed
               (null nil)
               (cons (flet ((tag-eq (type)
