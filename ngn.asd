@@ -19,7 +19,6 @@
   :author "subaru45"
   :license "NYSL"
   :depends-on (:cl-ppcre
-               :cl-annot
                :alexandria
                :inquisitor
                :trivial-shell
