@@ -187,6 +187,8 @@ is read as
               (null nil)
               (cons (flet ((tag-eq (type)
                              (eq type (car parsed))))
+                      (when (or (tag-eq :block) (tag-eq :oneline) (tag-eq :dummy))
+                        (push "" lines))
                       (push-lines)
                       (setf lines nil
                             tag nil)
