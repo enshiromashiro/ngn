@@ -73,6 +73,14 @@
   (is-error (ngn.parser::parse-line ":") 'error))
 
 
+(deftest trim-empty-line
+  (is (ngn.parser::trim-empty-lines nil) nil)
+  (is (ngn.parser::trim-empty-lines '("")) '(""))
+  (is (ngn.parser::trim-empty-lines '("a" "b")) '("a" "b"))
+  (is (ngn.parser::trim-empty-lines '("" "a")) '("a"))
+  (is (ngn.parser::trim-empty-lines '("a" "")) '("a"))
+  (is (ngn.parser::trim-empty-lines '("" "a" "")) '("a")))
+
 
 (defun hash-eq (hash kv-pairs)
   (and (eq (hash-table-count hash) (length kv-pairs))
@@ -89,7 +97,87 @@
     (apply #'hash-eq (list (ngn.parser:parse in) kv-pairs))))
 
 (deftest parse
-  (ok (test-parse "" nil)))
+  (diag "null or ignored strings only")
+  (ok (test-parse "" nil))
+  (ok (test-parse "
+" nil))
+  (ok (test-parse "Katamari Damacy" nil))
+  (ok (test-parse "We ♥ Katamari
+" nil))
+ 
+  (diag "comment")
+  (ok (test-parse "; Katamari on the Rock" nil))
+  (ok (test-parse "; Katamari on the Swing
+" nil))
+  (ok (test-parse "; Katamari on the Funk
+; Katamari Dancing" nil))
+
+  (diag "tags")
+  (ok (test-parse ":title みんな大好き塊魂"
+                  '((title "みんな大好き塊魂"))))
+
+
+  (ok (test-parse ":body
+
+エブリデイ エブリバディ
+君と王様のレインボー (yes!)
+愛のメッセージ
+
+"
+                  '((body "エブリデイ エブリバディ
+君と王様のレインボー (yes!)
+愛のメッセージ"))))
+
+  (diag "block tag with empty lines")
+  (ok (test-parse ":body" '((body ""))))
+  (ok (test-parse ":body
+"
+                  '((body ""))))
+  (ok (test-parse ":body
+
+"
+                  '((body ""))))
+
+  (diag "block tag with null data")
+  (ok (test-parse ":body
+:title test"
+                  '((body "")
+                    (title "test"))))
+  (ok (test-parse ":body
+:ps"
+                  '((body "")
+                    (ps ""))))
+  (ok (test-parse ":body
+:dummy:"
+                  '((body ""))))
+
+  (diag "ignoring dummy")
+  (ok (test-parse ":body
+
+ナナーナナナナナーナーナーナ
+塊魂ー
+
+:dummy:
+
+おそろいのTシャツ(Yeah!)
+手編みのマフラーと(Oh yeah!)
+
+:body2
+
+固めて転がして I love you
+いつでも Slime for you
+
+"
+                  '((body "ナナーナナナナナーナーナーナ
+塊魂ー")
+                    (body2 "固めて転がして I love you
+いつでも Slime for you"))))
+
+  (diag "note that this is regarded oneline tag")
+  (ok (test-parse ":not-dummy :" '((not-dummy ":"))))
+
+  (diag "invalid syntax")
+  (is-error (test-parse ":title_name test" nil) 'error))
 
 
 
