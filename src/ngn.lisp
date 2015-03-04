@@ -5,8 +5,7 @@
 
 (in-package :cl-user)
 (defpackage ngn
-  (:use :cl
-        :cl-annot)
+  (:use :cl)
   (:import-from :ngn.parser
                 :parse)
   (:import-from :ngn.renderer
@@ -18,10 +17,10 @@
   (:import-from :unix-options
                 :&free
                 :print-usage-summary
-                :with-cli-options))
+                :with-cli-options)
+  (:export :ngn
+           :app))
 (in-package :ngn)
-
-(enable-annot-syntax)
 
 
 (defvar *app-name*
@@ -80,7 +79,6 @@ Options:~%~@{~a~%~}~%")
        (merge-pathnames *renderer-dirname* renderer-basepath))))
 
 
-@export
 (defun ngn (tmpstream &optional instream outstream)
   (let* ((tmppath (truename tmpstream))
          (tags (parse instream))
@@ -88,7 +86,6 @@ Options:~%~@{~a~%~}~%")
           (make-renderer-path tmppath (runtime-pathname))))
     (render tags outstream tmpstream renderer-path)))
 
-@export
 (defun app ()
   (with-cli-options ()
       (debug version help &free free)

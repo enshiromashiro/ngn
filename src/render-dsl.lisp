@@ -5,11 +5,9 @@
 
 (in-package :cl-user)
 (defpackage ngn.render-dsl
-  (:use :cl
-        :cl-annot))
+  (:use :cl)
+  (:export :eval-tags))
 (in-package :ngn.render-dsl)
-
-(cl-annot:enable-annot-syntax)
 
 
 ;;;; these functions are defined by user
@@ -157,7 +155,6 @@
       (read-dsl in))))
 
 
-@export
 (defun eval-tags (tags renderer-path)
   (let ((*package* (find-package :ngn.render-dsl)))
     (load renderer-path))

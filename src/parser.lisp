@@ -5,13 +5,11 @@
 
 (in-package :cl-user)
 (defpackage ngn.parser
-  (:use :cl
-        :cl-annot)
+  (:use :cl)
   (:import-from :cl-ppcre
-                :scan-to-strings))
+                :scan-to-strings)
+  (:export :parse))
 (in-package :ngn.parser)
-
-(enable-annot-syntax)
 
 
 (defconstant +ngn-tag-char+ #\:)
@@ -86,7 +84,6 @@ If _lines_ is nil, then returns nil."
             ((and (eq begin 0) (eq end (1- (length lines)))) lines)
             (t (subseq lines begin (1+ end)))))))
 
-@export
 (defun parse (stream)
   "Parse the ngn-syntax text lines from input stream _stream_.
 The ngn-syntax are mainly consist of three elements.

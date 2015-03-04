@@ -5,18 +5,16 @@
 
 (in-package :cl-user)
 (defpackage ngn.renderer
-  (:use :cl
-        :cl-annot)
+  (:use :cl)
   (:import-from :ngn.render-dsl
                 :eval-tags)
   (:import-from :cl-ppcre
                 :regex-replace-all
                 :scan)
   (:import-from :inquisitor
-                :detect-external-format))
+                :detect-external-format)
+  (:export :render))
 (in-package :ngn.renderer)
-
-(cl-annot:enable-annot-syntax)
 
 
 (defun make-marker-regex (name)
@@ -50,7 +48,6 @@
                   (write-line outline out)))))))
 
 
-@export
 (defun render (tags outstream tmpstream rndrpath)
   "render text from _tags_ and _tmpstream_ to _outstream_ with `renderer` at _rndpath_.
 _tag_ is a hashtable. 
