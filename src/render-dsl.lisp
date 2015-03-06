@@ -6,7 +6,7 @@
 (in-package :cl-user)
 (defpackage ngn.render-dsl
   (:use :cl)
-  (:export :eval-tags))
+  (:export :render-tags))
 (in-package :ngn.render-dsl)
 
 
@@ -124,7 +124,7 @@
 
 
 ;;;; dsl reader
-(defun read-dsl (stream)
+(defun dsl-reader (stream)
   (let ((linum 1)
         (linehead? t))
     (declare (ignore linum))
@@ -152,10 +152,10 @@
     (with-input-from-string (in (if (find #\newline str)
                                     (multiline str)
                                     str))
-      (read-dsl in))))
+      (dsl-reader in))))
 
 
-(defun eval-tags (tags renderer-path)
+(defun render-tags (tags renderer-path)
   (let ((*package* (find-package :ngn.render-dsl)))
     (load renderer-path))
   (let ((new-tags (make-hash-table)))  

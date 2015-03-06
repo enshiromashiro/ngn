@@ -7,7 +7,7 @@
 (defpackage ngn.renderer
   (:use :cl)
   (:import-from :ngn.render-dsl
-                :eval-tags)
+                :render-tags)
   (:import-from :cl-ppcre
                 :regex-replace-all
                 :scan)
@@ -52,4 +52,4 @@
   "render text from _tags_ and _tmpstream_ to _outstream_ with `renderer` at _rndpath_.
 _tag_ is a hashtable. 
 `renderer` is a file include functions called by render-dsl module"
-  (embed-into-template (eval-tags tags rndrpath) tmpstream outstream))
+  (embed-into-template (render-tags tags rndrpath) tmpstream outstream))
