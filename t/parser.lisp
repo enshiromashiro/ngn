@@ -151,6 +151,21 @@
 :dummy:"
                   '((body ""))))
 
+  (diag "escape sequences")
+  (ok (test-parse ":;ignored" nil))
+  (ok (test-parse "::ignored" nil))
+  (ok (test-parse ":body
+:;not-comment"
+                  '((body ";not-comment"))))
+  (ok (test-parse ":body
+::not-blocktag"
+                  '((body ":not-blocktag"))))
+  (ok (test-parse ":body
+:; not-comment
+::not-blocktag"
+                  '((body "; not-comment
+:not-blocktag"))))
+
   (diag "ignoring dummy")
   (ok (test-parse ":body
 
