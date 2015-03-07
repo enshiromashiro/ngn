@@ -26,8 +26,8 @@
   :components ((:module "src"
                 :components
                 ((:file "parser")
-                 (:file "render-dsl")
-                 (:file "renderer" :depends-on ("render-dsl"))
+                 (:file "dsl")
+                 (:file "renderer" :depends-on ("dsl"))
                  (:file "ngn" :depends-on ("parser" "renderer")))))
   :description "novel page generator"
   :long-description

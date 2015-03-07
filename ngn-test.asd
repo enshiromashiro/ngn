@@ -16,7 +16,7 @@
   :components ((:module "t"
                 :components
                 ((:file "parser")
-                 (:file "render-dsl")
+                 (:file "dsl")
                  (:file "renderer")
                  (:file "ngn"))))
   :perform (load-op :after (op c) (asdf:clear-system c)))

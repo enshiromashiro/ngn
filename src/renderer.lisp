@@ -6,7 +6,7 @@
 (in-package :cl-user)
 (defpackage ngn.renderer
   (:use :cl)
-  (:import-from :ngn.render-dsl
+  (:import-from :ngn.dsl
                 :render-tags)
   (:import-from :cl-ppcre
                 :regex-replace-all

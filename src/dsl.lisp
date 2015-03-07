@@ -4,10 +4,10 @@
 |#
 
 (in-package :cl-user)
-(defpackage ngn.render-dsl
+(defpackage ngn.dsl
   (:use :cl)
   (:export :render-tags))
-(in-package :ngn.render-dsl)
+(in-package :ngn.dsl)
 
 
 ;;;; these functions are defined by user

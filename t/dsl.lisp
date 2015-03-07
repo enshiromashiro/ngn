@@ -4,11 +4,11 @@
 |#
 
 (in-package :cl-user)
-(defpackage ngn.render-dsl-test
+(defpackage ngn.dsl-test
   (:use :cl
         :ngn.parser
         :prove))
-(in-package :ngn.render-dsl-test)
+(in-package :ngn.dsl-test)
 
 
 (plan nil)
@@ -16,7 +16,7 @@
 (deftest read-to
   (flet ((call-it (ch str)
            (with-input-from-string (in str)
-             (ngn.render-dsl::read-to ch in))))
+             (ngn.dsl::read-to ch in))))
     (is (call-it #\# "#") "")
     (is (call-it #\# "0123456789#") "0123456789")
     (is (call-it #\# "012345
@@ -27,7 +27,7 @@
 (deftest get-level
   (flet ((call-it (ch str)
            (with-input-from-string (in str)
-             (ngn.render-dsl::get-level ch in))))
+             (ngn.dsl::get-level ch in))))
     (multiple-value-bind (lev str)
         (call-it #\# "#### ")
       (is lev 4)
@@ -41,7 +41,7 @@
 (deftest paren-reader
   (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.render-dsl::paren-reader in))))
+             (ngn.dsl::paren-reader in))))
     (is (call-it "()") "")
     (is (call-it "(string)") "string")
     (is (call-it "(string)s") "string")
@@ -53,8 +53,8 @@
 (deftest element-reader
   (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.render-dsl::element-reader in))))
-    (let ((*package* (find-package :ngn.render-dsl)))
+             (ngn.dsl::element-reader in))))
+    (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
     (is (call-it "rb(str1)(str2)") "rb-str1str2")
@@ -70,8 +70,8 @@
 (deftest sharp-reader
   (flet ((call-it (str lhp)
            (with-input-from-string (in str)
-             (ngn.render-dsl::sharp-reader in lhp))))
-    (let ((*package* (find-package :ngn.render-dsl)))
+             (ngn.dsl::sharp-reader in lhp))))
+    (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
     (diag "non line-head")
@@ -93,8 +93,8 @@
 (deftest greater-reader
   (flet ((call-it (str lhp)
            (with-input-from-string (in str)
-             (ngn.render-dsl::greater-reader in lhp))))
-    (let ((*package* (find-package :ngn.render-dsl)))
+             (ngn.dsl::greater-reader in lhp))))
+    (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
     (is (call-it "\"str\"" nil) ">")
@@ -114,8 +114,8 @@ line2")
 (deftest dsl-reader
   (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.render-dsl::dsl-reader in))))
-    (let ((*package (find-package :ngn.render-dsl)))
+             (ngn.dsl::dsl-reader in))))
+    (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
     (diag "non line-head")
@@ -129,8 +129,8 @@ line2")
 
 (deftest render-tag
   (flet ((call-it (str)
-           (ngn.render-dsl::render-tag str)))
-    (let ((*package* (find-package :ngn.render-dsl)))
+           (ngn.dsl::render-tag str)))
+    (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
     (diag "non line-head")
@@ -153,8 +153,5 @@ bd-str2$
 hd1-header2
 ")))
 
-
-
-(run-test-all)
 
 (finalize)

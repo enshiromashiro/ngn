@@ -14,6 +14,6 @@
 (plan nil)
 
 
-
+(run-test-all)
 
 (finalize)
