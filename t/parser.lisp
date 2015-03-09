@@ -11,10 +11,10 @@
 (in-package :ngn.parser-test)
 
 
-(plan nil)
+(plan 5)
 
 
-(deftest determine-line-type
+(subtest "Testing determine-line-type"
   (is (ngn.parser::determine-line-type "") :plain)
 
   (is (ngn.parser::determine-line-type ":") :ngn-error-too-short)
@@ -28,7 +28,7 @@
   (is (ngn.parser::determine-line-type "str") :plain))
 
 
-(deftest parse-tag
+(subtest "Testing parse-tag"
   (is (ngn.parser::parse-tag ":tag")
       '(:block . #("tag")) :test #'equalp)
   (is-error (ngn.parser::parse-tag ":tag ") 'error) ; *invalid syntax*
@@ -44,7 +44,7 @@
   (is-error (ngn.parser::parse-tag "::not-tag") 'error)) ; essape
 
 
-(deftest parse-line
+(subtest "Testing parse-line"
   (is (ngn.parser::parse-line "") "")
   (is (ngn.parser::parse-line "str") "str")
 
@@ -73,7 +73,7 @@
   (is-error (ngn.parser::parse-line ":") 'error))
 
 
-(deftest trim-empty-line
+(subtest "Testing trim-empty-line"
   (is (ngn.parser::trim-empty-lines nil) nil)
   (is (ngn.parser::trim-empty-lines '("")) '(""))
   (is (ngn.parser::trim-empty-lines '("a" "b")) '("a" "b"))
@@ -96,78 +96,77 @@
   (with-input-from-string (in str)
     (apply #'hash-eq (list (ngn.parser:parse in) kv-pairs))))
 
-(deftest parse
-  (diag "null or ignored strings only")
-  (ok (test-parse "" nil))
-  (ok (test-parse "
+(subtest "Testing parse"
+  (subtest "null or ignored strings only"
+    (ok (test-parse "" nil))
+    (ok (test-parse "
 " nil))
-  (ok (test-parse "Katamari Damacy" nil))
-  (ok (test-parse "We ♥ Katamari
-" nil))
+    (ok (test-parse "Katamari Damacy" nil))
+    (ok (test-parse "We ♥ Katamari
+" nil)))
  
-  (diag "comment")
-  (ok (test-parse "; Katamari on the Rock" nil))
-  (ok (test-parse "; Katamari on the Swing
+  (subtest "comment"
+    (ok (test-parse "; Katamari on the Rock" nil))
+    (ok (test-parse "; Katamari on the Swing
 " nil))
-  (ok (test-parse "; Katamari on the Funk
-; Katamari Dancing" nil))
+    (ok (test-parse "; Katamari on the Funk
+; Katamari Dancing" nil)))
 
-  (diag "tags")
-  (ok (test-parse ":title みんな大好き塊魂"
-                  '((title "みんな大好き塊魂"))))
+  (subtest "tags"
+    (ok (test-parse ":title みんな大好き塊魂"
+                    '((title "みんな大好き塊魂"))))
 
-
-  (ok (test-parse ":body
+    (ok (test-parse ":body
 
 エブリデイ エブリバディ
 君と王様のレインボー (yes!)
 愛のメッセージ
 
 "
-                  '((body "エブリデイ エブリバディ
+                    '((body "エブリデイ エブリバディ
 君と王様のレインボー (yes!)
-愛のメッセージ"))))
+愛のメッセージ")))))
 
-  (diag "block tag with empty lines")
-  (ok (test-parse ":body" '((body ""))))
-  (ok (test-parse ":body
+  (subtest "block tag with empty lines"
+    (ok (test-parse ":body" '((body ""))))
+    (ok (test-parse ":body
 "
-                  '((body ""))))
-  (ok (test-parse ":body
+                    '((body ""))))
+    (ok (test-parse ":body
 
 "
-                  '((body ""))))
+                    '((body "")))))
 
-  (diag "block tag with null data")
-  (ok (test-parse ":body
+  (subtest "block tag with null data"
+    (ok (test-parse ":body
 :title test"
-                  '((body "")
-                    (title "test"))))
-  (ok (test-parse ":body
+                    '((body "")
+                      (title "test"))))
+    (ok (test-parse ":body
 :ps"
-                  '((body "")
-                    (ps ""))))
-  (ok (test-parse ":body
+                    '((body "")
+                      (ps ""))))
+    (ok (test-parse ":body
 :dummy:"
-                  '((body ""))))
+                    '((body "")))))
 
-  (diag "escape sequences")
-  (ok (test-parse ":;ignored" nil))
-  (ok (test-parse "::ignored" nil))
-  (ok (test-parse ":body
+  (subtest "escape sequences"
+    (ok (test-parse ":;ignored" nil))
+    (ok (test-parse "::ignored" nil))
+    (ok (test-parse ":body
 :;not-comment"
-                  '((body ";not-comment"))))
-  (ok (test-parse ":body
+                    '((body ";not-comment"))))
+    (ok (test-parse ":body
 ::not-blocktag"
-                  '((body ":not-blocktag"))))
-  (ok (test-parse ":body
+                    '((body ":not-blocktag"))))
+    (ok (test-parse ":body
 :; not-comment
 ::not-blocktag"
-                  '((body "; not-comment
-:not-blocktag"))))
+                    '((body "; not-comment
+:not-blocktag")))))
 
-  (diag "ignoring dummy")
-  (ok (test-parse ":body
+  (subtest "ignoring dummy"
+    (ok (test-parse ":body
 
 ナナーナナナナナーナーナーナ
 塊魂ー
@@ -183,19 +182,16 @@
 いつでも Slime for you
 
 "
-                  '((body "ナナーナナナナナーナーナーナ
+                    '((body "ナナーナナナナナーナーナーナ
 塊魂ー")
-                    (body2 "固めて転がして I love you
-いつでも Slime for you"))))
+                      (body2 "固めて転がして I love you
+いつでも Slime for you")))))
 
-  (diag "note that this is regarded oneline tag")
-  (ok (test-parse ":not-dummy :" '((not-dummy ":"))))
+  (subtest "note that this is regarded oneline tag"
+    (ok (test-parse ":not-dummy :" '((not-dummy ":")))))
 
-  (diag "invalid syntax")
-  (is-error (test-parse ":title_name test" nil) 'error))
+  (subtest "invalid syntax"
+    (is-error (test-parse ":title_name test" nil) 'error)))
 
-
-
-(run-test-all)
 
 (finalize)

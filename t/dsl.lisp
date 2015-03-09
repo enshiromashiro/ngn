@@ -11,9 +11,9 @@
 (in-package :ngn.dsl-test)
 
 
-(plan nil)
+(plan 8)
 
-(deftest read-to
+(subtest "Testing read-to"
   (flet ((call-it (ch str)
            (with-input-from-string (in str)
              (ngn.dsl::read-to ch in))))
@@ -24,7 +24,7 @@
 6789")))
 
 
-(deftest get-level
+(subtest "Testing get-level"
   (flet ((call-it (ch str)
            (with-input-from-string (in str)
              (ngn.dsl::get-level ch in))))
@@ -38,7 +38,7 @@
       (is str "####"))))
 
 
-(deftest paren-reader
+(subtest "Testing paren-reader"
   (flet ((call-it (str)
            (with-input-from-string (in str)
              (ngn.dsl::paren-reader in))))
@@ -46,11 +46,11 @@
     (is (call-it "(string)") "string")
     (is (call-it "(string)s") "string")
 
-    (diag "error case")
-    (is-error (call-it "(") 'error)))
+    (subtest "error case"
+      (is-error (call-it "(") 'error))))
 
 
-(deftest element-reader
+(subtest "Testing element-reader"
   (flet ((call-it (str)
            (with-input-from-string (in str)
              (ngn.dsl::element-reader in))))
@@ -64,33 +64,34 @@
     (is (call-it "bi(str)") "bi-str")
     (is (call-it "ul(str)") "ul-str")
  
-    (is-error (call-it "aa") 'error)))
+    (subtest "error case"
+      (is-error (call-it "aa") 'error))))
 
 
-(deftest sharp-reader
+(subtest "Testing sharp-reader"
   (flet ((call-it (str lhp)
            (with-input-from-string (in str)
              (ngn.dsl::sharp-reader in lhp))))
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (diag "non line-head")
-    (is (call-it "rb(s1)(s2)" nil) "rb-s1s2")
-    (is (call-it " header" nil) "#")
-    (is (call-it "# header" nil) "##")
+    (subtest "non line-head"
+      (is (call-it "rb(s1)(s2)" nil) "rb-s1s2")
+      (is (call-it " header" nil) "#")
+      (is (call-it "# header" nil) "##"))
 
-    (diag "line-head")
-    (is (call-it "rb(s1)(s2)" t) "rb-s1s2")
-    (is (call-it " header" t) "hd1-header")
-    (is (call-it "# header" t) "hd2-header")
+    (subtest "line-head"
+      (is (call-it "rb(s1)(s2)" t) "rb-s1s2")
+      (is (call-it " header" t) "hd1-header")
+      (is (call-it "# header" t) "hd2-header"))
 
-    (diag "boundary")
-    (is (call-it "## header" t) "hd3-header")
-    (is (call-it "### header" t) "hd4-header")
-    (is (call-it "#### header" t) "#####")))
+    (subtest "boundary"
+      (is (call-it "## header" t) "hd3-header")
+      (is (call-it "### header" t) "hd4-header")
+      (is (call-it "#### header" t) "#####"))))
 
 
-(deftest greater-reader
+(subtest "Testing greater-reader"
   (flet ((call-it (str lhp)
            (with-input-from-string (in str)
              (ngn.dsl::greater-reader in lhp))))
@@ -104,54 +105,54 @@ line2\"" t)
         "qt1-line1
 line2")
 
-    (diag "boundary")
-    (is (call-it ">\"str\"" t) "qt2-str")
-    (is (call-it ">>\"str\"" t) "qt3-str")
-    (is (call-it ">>>\"str\"" t) "qt4-str")
-    (is (call-it ">>>>\"str\"" t) ">>>>>")))
+    (subtest "boundary"
+      (is (call-it ">\"str\"" t) "qt2-str")
+      (is (call-it ">>\"str\"" t) "qt3-str")
+      (is (call-it ">>>\"str\"" t) "qt4-str")
+      (is (call-it ">>>>\"str\"" t) ">>>>>"))))
 
 
-(deftest dsl-reader
+(subtest "Testing dsl-reader"
   (flet ((call-it (str)
            (with-input-from-string (in str)
              (ngn.dsl::dsl-reader in))))
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (diag "non line-head")
-    (is (call-it " #rb(s1)(s2)") " rb-s1s2")
-    (is (call-it " >\"s\"") " >\"s\"")
+    (subtest "non line-head"
+      (is (call-it " #rb(s1)(s2)") " rb-s1s2")
+      (is (call-it " >\"s\"") " >\"s\""))
 
-    (diag "line-head")
-    (is (call-it "#rb(s1)(s2)") "rb-s1s2")
-    (is (call-it ">\"s\"") "qt1-s")))
+    (subtest "line-head"
+      (is (call-it "#rb(s1)(s2)") "rb-s1s2")
+      (is (call-it ">\"s\"") "qt1-s"))))
 
 
-(deftest render-tag
+(subtest "Testing render-tag"
   (flet ((call-it (str)
            (ngn.dsl::render-tag str)))
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (diag "non line-head")
-    (is (call-it " #rb(s1)(s2)") " rb-s1s2")
-    (is (call-it " # rb(s1)(s2)") " # rb(s1)(s2)")
+    (subtest "non line-head"
+      (is (call-it " #rb(s1)(s2)") " rb-s1s2")
+      (is (call-it " # rb(s1)(s2)") " # rb(s1)(s2)"))
 
-    (diag "line-head")
-    (is (call-it "#rb(s1)(s2)") "rb-s1s2")
-    (is (call-it "# rb(s1)(s2)") "hd1-rb(s1)(s2)")
+    (subtest "line-head"
+      (is (call-it "#rb(s1)(s2)") "rb-s1s2")
+      (is (call-it "# rb(s1)(s2)") "hd1-rb(s1)(s2)"))
 
-    (diag "multi-line")
-    (is (call-it "#em(str1)
+    (subtest "multi-line"
+      (is (call-it "#em(str1)
 #bd(str2)")
-        "em-str1$
+          "em-str1$
 bd-str2$
 ")
-    (is (call-it "# header1
+      (is (call-it "# header1
 # header2")
-        "hd1-header1
+          "hd1-header1
 hd1-header2
-")))
+"))))
 
 
 (finalize)
