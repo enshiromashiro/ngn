@@ -19,7 +19,7 @@
 
 (defun make-marker-regex (name)
   (etypecase name
-    (string (format nil "#\\|~a\\|#" name))
+    (string (format nil "#\\|~a\\|#" (string-downcase name)))
     (symbol (format nil "#\\|~a\\|#" (string-downcase name)))))
 
 (defun included-markers (tags line)
