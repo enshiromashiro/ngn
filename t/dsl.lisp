@@ -42,16 +42,16 @@
       (is str "####"))))
 
 
-(subtest "Testing paren-reader"
+(subtest "Testing bracket-reader"
   (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.dsl::paren-reader in))))
-    (is (call-it "()") "")
-    (is (call-it "(string)") "string")
-    (is (call-it "(string)s") "string")
+             (ngn.dsl::bracket-reader in))))
+    (is (call-it "[]") "")
+    (is (call-it "[string]") "string")
+    (is (call-it "[string]s") "string")
 
     (subtest "error case"
-      (is-error (call-it "(") 'error))))
+      (is-error (call-it "[") 'error))))
 
 
 (subtest "Testing element-reader"
@@ -61,12 +61,12 @@
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (is (call-it "rb(str1)(str2)") "rb-str1str2")
-    (is (call-it "em(str)") "em-str")
-    (is (call-it "bd(str)") "bd-str")
-    (is (call-it "it(str)") "it-str")
-    (is (call-it "bi(str)") "bi-str")
-    (is (call-it "ul(str)") "ul-str")
+    (is (call-it "rb[str1][str2]") "rb-str1str2")
+    (is (call-it "em[str]") "em-str")
+    (is (call-it "bd[str]") "bd-str")
+    (is (call-it "it[str]") "it-str")
+    (is (call-it "bi[str]") "bi-str")
+    (is (call-it "ul[str]") "ul-str")
  
     (subtest "error case"
       (is-error (call-it "aa") 'error))))
@@ -80,12 +80,12 @@
       (load "t/test-renderer.lisp"))
 
     (subtest "non line-head"
-      (is (call-it "rb(s1)(s2)" nil) "rb-s1s2")
+      (is (call-it "rb[s1][s2]" nil) "rb-s1s2")
       (is (call-it " header" nil) "#")
       (is (call-it "# header" nil) "##"))
 
     (subtest "line-head"
-      (is (call-it "rb(s1)(s2)" t) "rb-s1s2")
+      (is (call-it "rb[s1][s2]" t) "rb-s1s2")
       (is (call-it " header" t) "hd1-header")
       (is (call-it "# header" t) "hd2-header"))
 
