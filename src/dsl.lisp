@@ -48,16 +48,15 @@
        do (write-char (read-char stream) out))))
 
 (defun get-level (char stream)
-  (let ((level 0))
-    (with-string-output-stream (out)
-      (with-read-char
-        (loop
-           for c = (readch)
-           unless (eq c char) do (unread-char c stream)
-           while (eq c char)
-           do (incf level)
-             (write-char c out))
-        (values level (get-output-stream-string out))))))
+  (let* ((level 0)
+         (str (with-output-to-string (out)
+                (loop
+                   for c = (peek-char nil stream nil :eof)
+                   while (eq c char)
+                   do (incf level)
+                      (write-char c out)
+                      (read-char stream nil :eof)))))
+    (values level str)))
 
 (defmacro with-level ((levvar strvar char stream) &body body)
   `(multiple-value-bind (,levvar ,strvar) (get-level ,char ,stream)
