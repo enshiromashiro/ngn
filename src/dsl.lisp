@@ -64,33 +64,33 @@
 
 
 ;;;; sharp reader
-(defun paren-reader (stream)
-  (if (eq #\( (peek-char nil stream))
+(defun bracket-reader (stream)
+  (if (eq #\[ (peek-char nil stream))
       (with-string-output-stream (out)
         (with-read-char
           (read-char stream)
           (loop
              for c = (readch)
              if (eq c :eof) do (ngn-error "unexpected EOF")
-             until (eq c #\))
+             until (eq c #\])
              do (write-char c out))
           (get-output-stream-string out)))
-      (ngn-error "\"~a\" is not open-paren" (peek-char nil stream))))
+      (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream))))
 
 (defun element-reader (stream)
   (let ((kind (format nil "~a~a" (read-char stream) (read-char stream))))
     (cond ((string= kind "rb") ; for ruby
-           (render-ruby (paren-reader stream) (paren-reader stream)))
+           (render-ruby (bracket-reader stream) (bracket-reader stream)))
           ((string= kind "em") ; for emphasis
-           (render-emphasis (paren-reader stream)))
+           (render-emphasis (bracket-reader stream)))
           ((string= kind "bd") ; for bold
-           (render-bold (paren-reader stream)))
+           (render-bold (bracket-reader stream)))
           ((string= kind "it") ; for italic
-           (render-italic (paren-reader stream)))
+           (render-italic (bracket-reader stream)))
           ((string= kind "bi") ; for bold-italic
-           (render-bold-italic (paren-reader stream)))
+           (render-bold-italic (bracket-reader stream)))
           ((string= kind "ul") ; for underline
-           (render-underline (paren-reader stream)))
+           (render-underline (bracket-reader stream)))
           (t (ngn-error "'~a' is not ngn-element" kind)))))
 
 (defun sharp-reader (stream linehead-p)
