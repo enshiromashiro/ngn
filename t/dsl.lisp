@@ -124,11 +124,11 @@ line2")
       (load "t/test-renderer.lisp"))
 
     (subtest "non line-head"
-      (is (call-it " #rb(s1)(s2)") " rb-s1s2")
+      (is (call-it " #rb[s1][s2]") " rb-s1s2")
       (is (call-it " >\"s\"") " >\"s\""))
 
     (subtest "line-head"
-      (is (call-it "#rb(s1)(s2)") "rb-s1s2")
+      (is (call-it "#rb[s1][s2]") "rb-s1s2")
       (is (call-it ">\"s\"") "qt1-s"))))
 
 
@@ -139,16 +139,16 @@ line2")
       (load "t/test-renderer.lisp"))
 
     (subtest "non line-head"
-      (is (call-it " #rb(s1)(s2)") " rb-s1s2")
-      (is (call-it " # rb(s1)(s2)") " # rb(s1)(s2)"))
+      (is (call-it " #rb[s1][s2]") " rb-s1s2")
+      (is (call-it " # rb[s1][s2]") " # rb[s1][s2]"))
 
     (subtest "line-head"
-      (is (call-it "#rb(s1)(s2)") "rb-s1s2")
-      (is (call-it "# rb(s1)(s2)") "hd1-rb(s1)(s2)"))
+      (is (call-it "#rb[s1][s2]") "rb-s1s2")
+      (is (call-it "# rb[s1][s2]") "hd1-rb[s1][s2]"))
 
     (subtest "multi-line"
-      (is (call-it "#em(str1)
-#bd(str2)")
+      (is (call-it "#em[str1]
+#bd[str2]")
           "em-str1$
 bd-str2$
 ")
