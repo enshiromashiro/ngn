@@ -63,7 +63,7 @@
      ,@body))
 
 
-;;;; reader
+;;;; sharp reader
 (defun paren-reader (stream)
   (if (eq #\( (peek-char nil stream))
       (with-string-output-stream (out)
@@ -103,22 +103,55 @@
                      (format nil "~a " str))
                  (format nil "#~a" str))))))
 
+
+;;;; greater reader
+(defun line-reader (line)
+  (with-input-from-string (in line)
+    (with-output-to-string (out)
+      (loop
+         for c = (read-char in nil :eof)
+         until (eq c :eof)
+         do (case c
+              (#\# (write-string (sharp-reader in nil) out))
+              (otherwise (write-char c out)))))))
+
 (defun greater-reader (stream linehead-p)
   (if linehead-p
-      (with-level (lev str #\> stream)
-        (if (< lev +render-quote-level-max+)
-            (if (eq (read-char stream) #\")
-                (render-quote
-                 (with-output-to-string (out)
-                   (loop
-                      for c = (read-char stream)
-                      until (eq c #\")
-                      do (case c
-                           (#\# (write-string (sharp-reader stream nil) out))
-                           (otherwise (write-char c out)))))
-                 (1+ lev))
-                (format nil "~a\"" str))
-            (format nil ">~a" str)))
+      (with-output-to-string (out)
+        (let ((now-level)
+              (lines))
+          (flet ((quote-level-p (level)
+                   (and (< 0 level)
+                        (<= level +render-quote-level-max+)))
+                 (push-line ()
+                   (push (line-reader (read-line stream)) lines))
+                 (render-lines ()
+                   (write-line
+                    (render-quote (format nil "~{~a~%~}" (nreverse lines))
+                                  now-level)
+                    out)))
+            (loop 
+               for lvlist = (multiple-value-list (get-level #\> stream))
+               for level = (1+ (first lvlist)) then (first lvlist)
+               for gtstr = (second lvlist)
+               while (quote-level-p level)
+               finally (unless (null lines)
+                         (render-lines))
+                       (unless (quote-level-p level)
+                         (write-string gtstr out))
+               do (when (null now-level)
+                    (setf now-level level))
+                 (if (eq #\space (peek-char nil stream nil :eof))
+                     (progn
+                       (read-char stream)
+                       (if (eq now-level level)
+                           (push-line)
+                           (progn
+                             (render-lines)
+                             (setf now-level level
+                                   lines nil)
+                             (push-line))))
+                     (format out "~a~a" gtstr (read-char stream nil "")))))))
       ">"))
 
 
