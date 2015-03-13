@@ -102,18 +102,49 @@
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (is (call-it "\"str\"" nil) ">")
-    (is (call-it "\"str\"" t) "qt1-str")
-    (is (call-it "\"line1
-line2\"" t)
+    (is (call-it " str" nil) ">")
+    (is (call-it " str" t) "qt1-str
+")
+    (is (call-it " line1
+> line2" t)
         "qt1-line1
-line2")
+line2
+")
 
     (subtest "boundary"
-      (is (call-it ">\"str\"" t) "qt2-str")
-      (is (call-it ">>\"str\"" t) "qt3-str")
-      (is (call-it ">>>\"str\"" t) "qt4-str")
-      (is (call-it ">>>>\"str\"" t) ">>>>>"))))
+      (is (call-it "> str" t)
+          "qt2-str
+")
+      (is (call-it ">> str" t)
+          "qt3-str
+")
+      (is (call-it ">>> str" t)
+          "qt4-str
+")
+      (is (call-it ">>>> str" t)
+          ">>>>"))
+
+    (subtest "multiline"
+      (is (call-it " line-qt1
+>>> line-qt3" t)
+          "qt1-line-qt1
+qt3-line-qt3
+")
+      (is (call-it " line-qt1
+normal-line" t)
+          "qt1-line-qt1
+")
+      (is (call-it "> line-qt2
+>> line-qt2
+>>>> line-qt4
+>>>> line-qt4
+> line-qt1" t)
+          "qt2-line-qt2
+line-qt2
+qt4-line-qt4
+line-qt4
+qt1-line-qt1
+"))))
 
 
 (subtest "Testing dsl-reader"
@@ -125,11 +156,12 @@ line2")
 
     (subtest "non line-head"
       (is (call-it " #rb[s1][s2]") " rb-s1s2")
-      (is (call-it " >\"s\"") " >\"s\""))
+      (is (call-it " > str") " > str"))
 
     (subtest "line-head"
       (is (call-it "#rb[s1][s2]") "rb-s1s2")
-      (is (call-it ">\"s\"") "qt1-s"))))
+      (is (call-it "> str") "qt1-str
+"))))
 
 
 (subtest "Testing render-tag"
