@@ -119,14 +119,15 @@
   (if linehead-p
       (with-output-to-string (out)
         (let ((now-level)
-              (lines))
+              (lines)
+              (remain-str))
           (flet ((quote-level-p (level)
                    (and (< 0 level)
                         (<= level +render-quote-level-max+)))
                  (push-line ()
                    (push (line-reader (read-line stream)) lines))
                  (render-lines ()
-                   (write-line
+                   (write-string
                     (render-quote (format nil "~{~a~%~}" (nreverse lines))
                                   now-level)
                     out)))
@@ -139,6 +140,8 @@
                          (render-lines))
                        (unless (quote-level-p level)
                          (write-string gtstr out))
+                       (when remain-str
+                         (write-string remain-str out))
                do (when (null now-level)
                     (setf now-level level))
                  (if (eq #\space (peek-char nil stream nil :eof))
@@ -151,7 +154,7 @@
                              (setf now-level level
                                    lines nil)
                              (push-line))))
-                     (format out "~a~a" gtstr (read-char stream nil "")))))))
+                     (setf remain-str (format nil ">~a" gtstr)))))))
       ">"))
 
 
