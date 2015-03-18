@@ -133,7 +133,7 @@ line2")
           "qt1-The em-quick brown fox ...")
       ; In quotation, header is ignored
       (is (call-it "> # header" t)
-          "# header"))
+          "qt1-# header"))
 
     (subtest "multiline"
       (is (call-it "> line-qt1
