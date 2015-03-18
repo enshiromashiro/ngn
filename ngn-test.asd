@@ -12,7 +12,7 @@
   :author "subaru45"
   :license "NYSL"
   :depends-on (:ngn
-			   :cl-test-more)
+			   :prove)
   :components ((:module "t"
                 :components
                 ((:file "parser")
