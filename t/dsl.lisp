@@ -110,6 +110,11 @@
         "qt1-line1
 line2
 ")
+    (is (call-it ">test" t) ">>")
+    (is (call-it "> test
+>str" t)
+        "qt2-test
+>")
 
     (subtest "boundary"
       (is (call-it "> str" t)
@@ -161,7 +166,24 @@ qt1-line-qt1
     (subtest "line-head"
       (is (call-it "#rb[s1][s2]") "rb-s1s2")
       (is (call-it "> str") "qt1-str
-"))))
+"))
+
+    (subtest "quotation"
+      (is (call-it ">str") ">str")
+      (is (call-it "> str1
+>>str2")
+          "qt1-str1
+>>str2")
+
+      (is (call-it ">> str1
+> str2")
+          "qt2-str1
+qt1-str2
+")
+      (is (call-it ">> str1
+>str2")
+          "qt2-str1
+>str2"))))
 
 
 (subtest "Testing render-tag"
