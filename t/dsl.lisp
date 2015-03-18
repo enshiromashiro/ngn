@@ -126,6 +126,15 @@ line2")
       (is (call-it ">>>>> str" t)
           ">>>>>"))
 
+    (subtest "sharp-reader in quotation"
+      (is (call-it "> #rb[text][ruby]" t)
+          "qt1-rb-textruby")
+      (is (call-it "> The #em[quick] brown fox ..." t)
+          "qt1-The em-quick brown fox ...")
+      ; In quotation, header is ignored
+      (is (call-it "> # header" t)
+          "# header"))
+
     (subtest "multiline"
       (is (call-it "> line-qt1
 >>> line-qt3" t)
