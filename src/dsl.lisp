@@ -111,11 +111,11 @@
   (with-input-from-string (in line)
     (with-output-to-string (out)
       (loop
-         for c = (read-char in nil :eof)
+         for c = (peek-char nil in nil :eof)
          until (eq c :eof)
          do (case c
               (#\# (write-string (sharp-reader in nil) out))
-              (otherwise (write-char c out)))))))
+              (otherwise (write-char (read-char in) out)))))))
 
 (defun greater-reader (stream linehead-p)
   (if linehead-p
