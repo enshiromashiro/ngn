@@ -128,17 +128,16 @@
                  (push-line ()
                    (push (line-reader (read-line stream)) lines))
                  (render-lines ()
-                   (write-string
-                    (render-quote (format nil "~{~a~%~}" (nreverse lines))
-                                  now-level)
-                    out)))
+                   (render-quote (format nil "~{~a~^~%~}" (nreverse lines))
+                                 now-level)))
             (loop 
                for lvlist = (multiple-value-list (get-level #\> stream))
                for level = (first lvlist)
                for gtstr = (second lvlist)
+               for firstqt? = t then nil
                while (quote-level-p level)
                finally (unless (null lines)
-                         (render-lines))
+                         (write-string (render-lines) out))
                        (unless (quote-level-p level)
                          (write-string gtstr out))
                        (when remain-str
@@ -151,11 +150,14 @@
                        (if (eq now-level level)
                            (push-line)
                            (progn
-                             (render-lines)
+                             (write-line (render-lines) out)
                              (setf now-level level
                                    lines nil)
                              (push-line))))
-                     (setf remain-str (format nil "~a" gtstr)))))))
+                     (setf remain-str
+                           (if firstqt?
+                               (format nil "~a" gtstr)
+                               (format nil "~%~a" gtstr))))))))
       (string (read-char stream nil ""))))
 
 
