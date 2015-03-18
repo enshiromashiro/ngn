@@ -99,9 +99,10 @@
          (element-reader stream))
         (t (with-level (lev str #\# stream)
              (if (and linehead-p (< lev +render-header-level-max+))
-                 (if (eq (read-char stream) #\space)
-                     (render-header (read-to #\newline stream) (1+ lev))
-                     (format nil "~a " str))
+                 (let ((ch (read-char stream)))
+                   (if (eq ch #\space)
+                       (render-header (read-to #\newline stream) (1+ lev))
+                       (format nil "#~a~a" str ch)))
                  (format nil "#~a" str))))))
 
 
