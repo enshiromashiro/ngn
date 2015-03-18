@@ -88,7 +88,7 @@
       (is (call-it "# header" t) "hd1-header"))
 
     (subtest "boundary about header syntax"
-      (is (call-it "#+++" nil) "#+")
+      (is (call-it "#+++" nil) "#")
       (is (call-it "#+++" t) "#+"))
 
     (subtest "boundary about header level"
