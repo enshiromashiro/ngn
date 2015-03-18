@@ -81,15 +81,17 @@
 
     (subtest "non line-head"
       (is (call-it "#rb[s1][s2]" nil) "rb-s1s2")
-      (is (call-it "# header" nil) "#")
-      (is-error (call-it "#header" nil) 'error))
+      (is (call-it "# header" nil) "#"))
 
     (subtest "line-head"
       (is (call-it "#rb[s1][s2]" t) "rb-s1s2")
-      (is (call-it "# header" t) "hd1-header")
-      (is-error (call-it "#header" t) 'error))
+      (is (call-it "# header" t) "hd1-header"))
 
-    (subtest "boundary"
+    (subtest "boundary about header syntax"
+      (is (call-it "#+++" nil) "#+")
+      (is (call-it "#+++" t) "#+"))
+
+    (subtest "boundary about header level"
       (is (call-it "### header" t) "hd3-header")
       (is (call-it "#### header" t) "hd4-header")
       (is (call-it "##### header" t) "#####"))))
@@ -150,6 +152,9 @@ qt1-line-qt1"))))
              (ngn.dsl::dsl-reader in))))
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
+
+    (subtest "boundary about header"
+      (is (call-it "#+++") "#+++"))
 
     (subtest "non line-head"
       (is (call-it " #rb[s1][s2]") " rb-s1s2")
