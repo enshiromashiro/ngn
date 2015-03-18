@@ -102,44 +102,37 @@
     (let ((*package* (find-package :ngn.dsl)))
       (load "t/test-renderer.lisp"))
 
-    (is (call-it " str" nil) ">")
-    (is (call-it " str" t) "qt1-str
-")
-    (is (call-it " line1
+    (is (call-it "> str" nil) ">")
+    (is (call-it "> str" t) "qt1-str")
+    (is (call-it "> line1
 > line2" t)
         "qt1-line1
-line2
-")
-    (is (call-it ">test" t) ">>")
-    (is (call-it "> test
+line2")
+    (is (call-it ">>test" t) ">>")
+    (is (call-it ">> test
 >str" t)
         "qt2-test
 >")
 
     (subtest "boundary"
-      (is (call-it "> str" t)
-          "qt2-str
-")
       (is (call-it ">> str" t)
-          "qt3-str
-")
+          "qt2-str")
       (is (call-it ">>> str" t)
-          "qt4-str
-")
+          "qt3-str")
       (is (call-it ">>>> str" t)
-          ">>>>"))
+          "qt4-str")
+      (is (call-it ">>>>> str" t)
+          ">>>>>"))
 
     (subtest "multiline"
-      (is (call-it " line-qt1
+      (is (call-it "> line-qt1
 >>> line-qt3" t)
           "qt1-line-qt1
-qt3-line-qt3
-")
-      (is (call-it " line-qt1
+qt3-line-qt3")
+      (is (call-it "> line-qt1
 normal-line" t)
-          "qt1-line-qt1
-")
-      (is (call-it "> line-qt2
+          "qt1-line-qt1")
+      (is (call-it ">> line-qt2
 >> line-qt2
 >>>> line-qt4
 >>>> line-qt4
@@ -148,8 +141,7 @@ normal-line" t)
 line-qt2
 qt4-line-qt4
 line-qt4
-qt1-line-qt1
-"))))
+qt1-line-qt1"))))
 
 
 (subtest "Testing dsl-reader"
@@ -165,8 +157,7 @@ qt1-line-qt1
 
     (subtest "line-head"
       (is (call-it "#rb[s1][s2]") "rb-s1s2")
-      (is (call-it "> str") "qt1-str
-"))
+      (is (call-it "> str") "qt1-str"))
 
     (subtest "quotation"
       (is (call-it ">str") ">str")
@@ -178,8 +169,7 @@ qt1-line-qt1
       (is (call-it ">> str1
 > str2")
           "qt2-str1
-qt1-str2
-")
+qt1-str2")
       (is (call-it ">> str1
 >str2")
           "qt2-str1
