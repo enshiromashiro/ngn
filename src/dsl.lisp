@@ -30,10 +30,6 @@
   (error (apply #'format
                 `(nil ,(format nil "[ngn] ~a" fmt) ,@args))))
 
-(defmacro with-read-char (&body body)
-  `(flet ((readch () (read-char stream nil :eof)))
-    ,@body))
-
 (defmacro with-string-output-stream ((var) &body body)
   `(let ((,var (make-string-output-stream)))
      (unwind-protect
@@ -67,15 +63,14 @@
 (defun bracket-reader (stream)
   (if (eq #\[ (peek-char nil stream))
       (with-string-output-stream (out)
-        (with-read-char
-          (read-char stream)
-          (loop
-             for c = (readch)
-             if (eq c :eof) do (ngn-error "unexpected EOF")
-             until (eq c #\])
-             do (write-char c out))
-          (get-output-stream-string out)))
-      (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream))))
+        (read-char stream)
+        (loop
+           for c = (read-char stream nil :eof)
+           if (eq c :eof) do (ngn-error "unexpected EOF")
+           until (eq c #\])
+           do (write-char c out))
+        (get-output-stream-string out)))
+  (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream)))
 
 (defun element-reader (stream)
   (let ((kind (format nil "~a~a" (read-char stream) (read-char stream))))
