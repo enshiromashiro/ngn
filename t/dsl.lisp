@@ -183,7 +183,17 @@ qt1-str2
       (is (call-it ">> str1
 >str2")
           "qt2-str1
->str2"))))
+>str2"))
+
+    (subtest "multiline"
+      (is (call-it "# header1
+## header2")
+          "hd1-header1
+hd2-header2")
+      (is (call-it " # header
+>> quote")
+          " # header
+qt2-quote"))))
 
 
 (subtest "Testing render-tag"
