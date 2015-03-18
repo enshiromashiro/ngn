@@ -80,19 +80,19 @@
       (load "t/test-renderer.lisp"))
 
     (subtest "non line-head"
-      (is (call-it "rb[s1][s2]" nil) "rb-s1s2")
-      (is (call-it " header" nil) "#")
-      (is (call-it "# header" nil) "##"))
+      (is (call-it "#rb[s1][s2]" nil) "rb-s1s2")
+      (is (call-it "# header" nil) "#")
+      (is-error (call-it "#header" nil) 'error))
 
     (subtest "line-head"
-      (is (call-it "rb[s1][s2]" t) "rb-s1s2")
-      (is (call-it " header" t) "hd1-header")
-      (is (call-it "# header" t) "hd2-header"))
+      (is (call-it "#rb[s1][s2]" t) "rb-s1s2")
+      (is (call-it "# header" t) "hd1-header")
+      (is-error (call-it "#header" t) 'error))
 
     (subtest "boundary"
-      (is (call-it "## header" t) "hd3-header")
-      (is (call-it "### header" t) "hd4-header")
-      (is (call-it "#### header" t) "#####"))))
+      (is (call-it "### header" t) "hd3-header")
+      (is (call-it "#### header" t) "hd4-header")
+      (is (call-it "##### header" t) "#####"))))
 
 
 (subtest "Testing greater-reader"
