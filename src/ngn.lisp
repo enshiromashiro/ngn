@@ -38,8 +38,7 @@ Output path is based on INFILE (or current directory).
 Options:~%~@{~a~%~}~%")
 
 (defvar *usage-option-spec*
-  '((("debug") nil "Print debug messages")
-    ((#\v "version") nil "Print version")
+  '(((#\v "version") nil "Print version")
     ((#\h "help") nil "Print this help")))
 
 
@@ -51,12 +50,6 @@ Options:~%~@{~a~%~}~%")
 (defun print-usage ()
   (format t "~a~%" *app-name*)
   (print-usage-summary *usage-string* *usage-option-spec*))
-
-
-(defparameter *debug* nil)
-(defun dbg (fmt &rest rest)
-  (when *debug*
-    (apply #'format `(t ,fmt ,@rest))))
 
 
 (defvar *renderer-dirname* "renderer/")
@@ -89,8 +82,6 @@ Options:~%~@{~a~%~}~%")
 (defun app ()
   (with-cli-options ()
       (debug version help &free free)
-    (when debug
-      (setf *debug* t))
     (cond (version (print-version)
                    (exit))
           (help (print-usage)
