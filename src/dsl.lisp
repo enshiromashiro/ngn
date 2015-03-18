@@ -94,6 +94,7 @@
           (t (ngn-error "'~a' is not ngn-element" kind)))))
 
 (defun sharp-reader (stream linehead-p)
+  (read-char stream)
   (cond ((alpha-char-p (peek-char nil stream))
          (element-reader stream))
         (t (with-level (lev str #\# stream)
@@ -133,7 +134,7 @@
                     out)))
             (loop 
                for lvlist = (multiple-value-list (get-level #\> stream))
-               for level = (1+ (first lvlist)) then (first lvlist)
+               for level = (first lvlist)
                for gtstr = (second lvlist)
                while (quote-level-p level)
                finally (unless (null lines)
@@ -154,26 +155,24 @@
                              (setf now-level level
                                    lines nil)
                              (push-line))))
-                     (setf remain-str (format nil ">~a" gtstr)))))))
-      ">"))
+                     (setf remain-str (format nil "~a" gtstr)))))))
+      (string (read-char stream nil ""))))
 
 
 ;;;; dsl reader
 (defun dsl-reader (stream)
-  (let ((linum 1)
-        (linehead? t))
-    (declare (ignore linum))
-    (with-output-to-string (out)
-      (with-read-char
-        (loop
-           for c = (readch)
-           until (eq c :eof)
-           do (case c
-                (#\# (write-string (sharp-reader stream linehead?) out))
-                (#\> (write-string (greater-reader stream linehead?) out))
-                (otherwise (write-char c out)))
-           when (eq c #\newline) do (incf linum) (setf linehead? t)
-           else do (setf linehead? nil))))))
+  (with-output-to-string (out)
+    (let ((prev-newline?))
+      (loop
+         for c = (peek-char nil stream nil :eof)
+         for linehead? = t then (if prev-newline? t nil)
+         for linum = 1 then (if prev-newline? (1+ linum) linum)
+         until (eq c :eof)
+         do (setf prev-newline? (eq c #\newline))
+            (case c
+              (#\# (write-string (sharp-reader stream linehead?) out))
+              (#\> (write-string (greater-reader stream linehead?) out))
+              (otherwise (write-char (read-char stream) out)))))))
 
 
 (defun render-tag (str)
