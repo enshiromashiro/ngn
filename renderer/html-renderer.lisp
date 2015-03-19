@@ -6,8 +6,7 @@
 
 ;; per-line rendering
 (defun render-per-line (line)
-  (if (or (ppcre:scan "^#+ " line)
-          (ppcre:scan "\"$" line))
+  (if (ppcre:scan "^#+ " line)
       line
       (format nil "~a<br>" line)))
 
@@ -41,5 +40,5 @@
 
 ;; quote rendering
 (defun render-quote (text level)
-  (format nil "<p class=\"quote~a\">~%~a~%</p>" level text))
+  (format nil "<p class=\"quote~a\">~%~a~%</p>~%" level text))
 
