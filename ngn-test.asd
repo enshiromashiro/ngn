@@ -17,6 +17,5 @@
                 :components
                 ((:file "parser")
                  (:file "dsl")
-                 (:file "renderer")
-                 (:file "ngn"))))
+                 (:file "renderer"))))
   :perform (load-op :after (op c) (asdf:clear-system c)))
