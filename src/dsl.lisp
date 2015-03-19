@@ -62,15 +62,14 @@
 ;;;; sharp reader
 (defun bracket-reader (stream)
   (if (eq #\[ (peek-char nil stream))
-      (with-string-output-stream (out)
+      (with-output-to-string (out)
         (read-char stream)
         (loop
            for c = (read-char stream nil :eof)
            if (eq c :eof) do (ngn-error "unexpected EOF")
            until (eq c #\])
-           do (write-char c out))
-        (get-output-stream-string out)))
-  (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream)))
+           do (write-char c out)))
+      (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream :eof))))
 
 (defun element-reader (stream)
   (let ((kind (format nil "~a~a" (read-char stream) (read-char stream))))
