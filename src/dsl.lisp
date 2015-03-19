@@ -30,12 +30,6 @@
   (error (apply #'format
                 `(nil ,(format nil "[ngn] ~a" fmt) ,@args))))
 
-(defmacro with-string-output-stream ((var) &body body)
-  `(let ((,var (make-string-output-stream)))
-     (unwind-protect
-          ,@body
-       (close ,var))))
-
 (defun read-to (char stream)
   (with-output-to-string (out)
     (loop
