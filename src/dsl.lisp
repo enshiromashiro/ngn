@@ -153,17 +153,17 @@
 ;;;; dsl reader
 (defun dsl-reader (stream)
   (with-output-to-string (out)
-    (let ((prev-newline?))
-      (loop
-         for c = (peek-char nil stream nil :eof)
-         for linehead? = t then (if prev-newline? t nil)
-         for linum = 1 then (if prev-newline? (1+ linum) linum)
-         until (eq c :eof)
-         do (setf prev-newline? (eq c #\newline))
-            (case c
-              (#\# (write-string (sharp-reader stream linehead?) out))
-              (#\> (write-string (greater-reader stream linehead?) out))
-              (otherwise (write-char (read-char stream) out)))))))
+    (loop
+       for c = (peek-char nil stream nil :eof)
+       for linehead? = t then (if prev-newline? t nil)
+       for linum = 1 then (if prev-newline? (1+ linum) linum)
+       with prev-newline? = nil
+       until (eq c :eof)
+       do (setf prev-newline? (eq c #\newline))
+         (case c
+           (#\# (write-string (sharp-reader stream linehead?) out))
+           (#\> (write-string (greater-reader stream linehead?) out))
+           (otherwise (write-char (read-char stream) out))))))
 
 
 (defun render-tag (str)
