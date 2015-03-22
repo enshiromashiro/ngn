@@ -18,7 +18,8 @@
                 ((:file "parser")
                  (:module "renderers"
                   :components
-                  ((:file "pixiv-renderer")))
+                  ((:file "html-renderer")
+                   (:file "pixiv-renderer")))
                  (:file "dsl" :depends-on ("renderers"))
                  (:file "renderer"))))
   :perform (load-op :after (op c) (asdf:clear-system c)))
