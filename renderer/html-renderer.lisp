@@ -6,7 +6,7 @@
 
 ;; per-line rendering
 (defun render-per-line (line)
-  (if (ppcre:scan "^#+ " line)
+  (if (ppcre:scan "^#\{1,4\} " line)
       line
       (format nil "~a<br>" line)))
 
