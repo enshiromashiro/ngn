@@ -180,10 +180,14 @@
       (dsl-reader in))))
 
 
+(defparameter *render-hook* #'identity)
+
 (defun render-tags (tags renderer-path)
   (let ((*package* (find-package :ngn.dsl)))
     (load renderer-path))
-  (let ((new-tags (make-hash-table)))  
+  (let ((new-tags (make-hash-table)))
     (maphash (lambda (k v) (setf (gethash k new-tags) (render-tag v)))
              tags)
+    (when (functionp *render-hook*)
+      (funcall *render-hook* new-tags))
     new-tags))
