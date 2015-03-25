@@ -40,11 +40,12 @@
        do (let ((markers (included-markers tags line)))
             (if (null markers)
                 (write-line line out)
-                (dolist (tag (included-markers tags line))
-                  (setf outline
-                        (regex-replace-all (make-marker-regex tag)
-                                           outline
-                                           (gethash tag tags)))
+                (progn
+                  (dolist (tag (included-markers tags line))
+                    (setf outline
+                          (regex-replace-all (make-marker-regex tag)
+                                             outline
+                                             (gethash tag tags))))
                   (write-line outline out)))))))
 
 
