@@ -32,21 +32,21 @@
     markers))
 
 (defun embed-into-template (tags in out)
-  (flet ((readline () (read-line in nil :eof)))
-    (loop
-       for line = (readline)
-       for outline = line then line
-       until (eq line :eof)
-       do (let ((markers (included-markers tags line)))
-            (if (null markers)
-                (write-line line out)
-                (progn
-                  (dolist (tag (included-markers tags line))
-                    (setf outline
-                          (regex-replace-all (make-marker-regex tag)
-                                             outline
-                                             (gethash tag tags))))
-                  (write-line outline out)))))))
+  (loop
+     for line = (read-line in nil :eof)
+     for outline = line then line
+     until (eq line :eof)
+     do (let ((markers (included-markers tags line)))
+          (if (null markers)
+              (write-line line out)
+              (progn
+                (dolist (tag (included-markers tags line))
+                  (setf outline
+                        (regex-replace-all
+                         (make-marker-regex tag)
+                         outline
+                         (gethash tag tags))))
+                (write-line outline out))))))
 
 
 (defun render (tags outstream tmpstream rndrpath)
