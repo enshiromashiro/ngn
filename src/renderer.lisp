@@ -35,10 +35,13 @@
   (loop
      for line = (read-line in nil :eof)
      for outline = line then line
+     for first? = t then nil
+     unless (or first? (eq line :eof))
+     do (format out "~%")
      until (eq line :eof)
      do (let ((markers (included-markers tags line)))
           (if (null markers)
-              (write-line line out)
+              (write-string line out)
               (progn
                 (dolist (tag (included-markers tags line))
                   (setf outline
@@ -46,7 +49,7 @@
                          (make-marker-regex tag)
                          outline
                          (gethash tag tags))))
-                (write-line outline out))))))
+                (write-string outline out))))))
 
 
 (defun render (tags outstream tmpstream rndrpath)
