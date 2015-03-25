@@ -53,6 +53,9 @@
       (setf (gethash 'title hash) "題名")
       (setf (gethash 'body hash) "本文")
 
+      (is (call-it "#|title|# - #|body|#" hash)
+          "題名 - 本文")
+
       (is (call-it "<html><head>
 <title>#|title|#</title>
 </head>
