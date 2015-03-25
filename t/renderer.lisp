@@ -69,8 +69,7 @@
 <body>
 <h1>#|titl|# - これはタイポ</h1>
 本文
-</body></html>
-"))))
+</body></html>"))))
 
 
 (finalize)
