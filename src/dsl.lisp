@@ -25,6 +25,39 @@
 (defvar +render-quote-level-max+ 4)
 
 
+;;;; syntax error notification
+(defparameter *line-number* nil)
+(defparameter *tag-name* nil)
+
+(defun init-linum ()
+  (setf *line-number* 1))
+(defun init-tag-name ()
+  (setf *tag-name* nil))
+
+(defun incf-linum ()
+  (incf *line-number*))
+(defun set-tag-name (name)
+  (setf *tag-name* name))
+
+(define-condition ngn-syntax-error (condition)
+  ((linum :initform *line-number*
+          :reader syntax-error-linum)
+   (tagname :initform *tag-name*
+            :reader syntax-error-tagname)
+   (message :initform ""
+            :initarg :msg
+            :reader syntax-error-message))
+  (:report (lambda (condition stream)
+             (format stream
+                     "[ngn]: syntax error at line ~a of \"~a\" tag.~%~a~%"
+                     (syntax-error-linum condition)
+                     (syntax-error-tagname condition)
+                     (syntax-error-message condition)))))
+
+(defun syntax-error (msg)
+  (error (make-condition ngn-syntax-error :msg msg)))
+
+
 ;;;; utilities
 (defun ngn-error (fmt &rest args)
   (error (apply #'format
