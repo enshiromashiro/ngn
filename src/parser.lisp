@@ -6,6 +6,10 @@
 (in-package :cl-user)
 (defpackage ngn.parser
   (:use :cl)
+  (:import-from :ngn.error
+                :init-linum
+                :incf-linum
+                :ngn-syntax-error)
   (:import-from :cl-ppcre
                 :scan-to-strings)
   (:export :parse))
@@ -58,7 +62,7 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
     (cond (oneline (cons :oneline oneline))
           (blocktag (cons :block blocktag))
           (dummy (cons :dummy dummy))
-          (t (error "invalid ngn syntax")))))
+          (t (ngn-syntax-error (format nil "Invalid tag syntax in this line: '~a'" line))))))
 
 (defun parse-line (line)
   (let ((line-type (determine-line-type line)))
@@ -68,7 +72,8 @@ This function expect a line is distinguished a :ngn-tag by determine-line-type f
       (:ngn-escape-comment (concatenate 'string ";" (subseq line 2)))
       (:ngn-escape-tag (concatenate 'string ":" (subseq line 2)))
       (:ngn-tag (parse-tag line))
-      (:ngn-error-too-short (error "invalid ngn syntax")))))
+      (:ngn-error-too-short
+       (ngn-syntax-error (format nil "No tag name in this line: '~a'" line))))))
 
 
 (defun trim-empty-lines (lines)
@@ -182,10 +187,12 @@ is read as
          for line = (read-line stream nil :eof)
          until (eq line :eof)
          for parsed = (parse-line line)
+         initially (init-linum)
          finally (when (block-tag-p tag)
                    (push-empty-line))
                  (push-lines)
-         do (etypecase parsed
+         do (incf-linum)
+            (etypecase parsed
               (null nil)
               (cons (let ((tagtype (car parsed)))
                       (when (member tagtype '(:block :oneline :dummy))
