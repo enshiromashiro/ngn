@@ -6,12 +6,29 @@
 (in-package :cl-user)
 (defpackage ngn.parser-test
   (:use :cl
+        :ngn.error
         :ngn.parser
         :prove))
 (in-package :ngn.parser-test)
 
 
 (plan 5)
+
+(defmacro tests-with-syntax-error (linum msg &body body)
+  `(handler-case
+       (progn
+         (init-linum)
+         ,@body)
+     (ngn-syntax-error (c)
+       (let ((linum-got (ngn.error::syntax-error-linum c))
+             (msg-got (ngn.error::syntax-error-message c)))
+         (is linum-got ,linum)
+         (is msg-got ,msg)))
+     (condition (c)
+       (fail (format nil "unexpected error ~a" c)))
+     (:no-error (v)
+       (declare (ignore v))
+       (fail "no error occurs"))))
 
 
 (subtest "Testing determine-line-type"
@@ -31,17 +48,27 @@
 (subtest "Testing parse-tag"
   (is (ngn.parser::parse-tag ":tag")
       '(:block . #("tag")) :test #'equalp)
-  (is-error (ngn.parser::parse-tag ":tag ") 'error) ; *invalid syntax*
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':tag '"
+    (ngn.parser::parse-tag ":tag ")) ; *invalid syntax*
   (is (ngn.parser::parse-tag ":tag data")
       '(:oneline . #("tag" "data")) :test #'equalp)
-  (is-error (ngn.parser::parse-tag "::") 'error) ; *invalid syntax*
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: '::'"
+    (ngn.parser::parse-tag "::")) ; *invalid syntax*
   (is (ngn.parser::parse-tag ":tag:")
  '(:dummy . #("tag")) :test #'equalp)
     
   ;; for unexpected args
-  (is-error (ngn.parser::parse-tag ":") 'error) ; *invalid syntax*
-  (is-error (ngn.parser::parse-tag ":;not-tag") 'error) ; escape
-  (is-error (ngn.parser::parse-tag "::not-tag") 'error)) ; essape
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':'"
+    (ngn.parser::parse-tag ":")) ; *invalid syntax*
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':;not-tag'"
+    (ngn.parser::parse-tag ":;not-tag")) ; escape
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: '::not-tag'"
+    (ngn.parser::parse-tag "::not-tag"))) ; essape
 
 
 (subtest "Testing parse-line"
@@ -59,18 +86,30 @@
   (is (ngn.parser::parse-line ":test-:")
       '(:dummy . #("test-")) :test #'equalp)
 
-  (is-error (ngn.parser::parse-line ":BLOCK") 'error)
-  (is-error (ngn.parser::parse-line ":block_") 'error)
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':BLOCK'"
+    (ngn.parser::parse-line ":BLOCK"))
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':block_'"
+    (ngn.parser::parse-line ":block_"))
 
-  (is-error (ngn.parser::parse-line ":onelineA data") 'error)
-  (is-error (ngn.parser::parse-line ":oneline_ data") 'error)
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':onelineA data'"
+    (ngn.parser::parse-line ":onelineA data"))
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':oneline_ data'"
+    (ngn.parser::parse-line ":oneline_ data"))
 
-  (is-error (ngn.parser::parse-line ":dummyA:") 'error)
+  (tests-with-syntax-error
+    1 "Invalid tag syntax in this line: ':dummyA:'"
+    (ngn.parser::parse-line ":dummyA:"))
   ; (is-error (ngn.parser::parse-line ":dummy :") 'error)
   (is (ngn.parser::parse-line ":dummy :")
       '(:oneline . #("dummy" ":")) :test #'equalp)
 
-  (is-error (ngn.parser::parse-line ":") 'error))
+  (tests-with-syntax-error
+    1 "No tag name in this line: ':'"
+    (ngn.parser::parse-line ":")))
 
 
 (subtest "Testing trim-empty-line"
@@ -191,7 +230,9 @@
     (ok (test-parse ":not-dummy :" '((not-dummy ":")))))
 
   (subtest "invalid syntax"
-    (is-error (test-parse ":title_name test" nil) 'error)))
+    (tests-with-syntax-error
+      1 "Invalid tag syntax in this line: ':title_name test'"
+      (test-parse ":title_name test" nil) 'error)))
 
 
 (finalize)
