@@ -4,7 +4,9 @@
 (require :asdf)
 (require :ngn)
 
-(defvar *app-name* "ngn")
+(defvar *app-name*
+  #-windows "ngn"
+  #+windows "ngn.exe")
 
 (defun build-app ()
   #+sbcl (save-lisp-and-die
