@@ -6,6 +6,7 @@
 (in-package :cl-user)
 (defpackage ngn.dsl-test
   (:use :cl
+        :ngn.error
         :ngn.parser
         :prove))
 (in-package :ngn.dsl-test)
@@ -13,15 +14,28 @@
 
 (plan 8)
 
-(subtest "Testing read-to"
-  (flet ((call-it (ch str)
+(defmacro tests-with-syntax-error (linum tagname msg &body body)
+  `(handler-case
+       (progn
+         (init-linum)
+         (init-tag-name)
+         ,@body)
+     (dsl-syntax-error (c)
+       (let ((linum-got (ngn.error::syntax-error-linum c))
+             (tagname-got (ngn.error::syntax-error-tagname c))
+             (msg-got (ngn.error::syntax-error-message c)))
+         (is linum-got ,linum)
+         (is tagname-got ,tagname)
+         (is msg-got ,msg)))))
+
+
+(subtest "Testing read-before-newline"
+  (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.dsl::read-to ch in))))
-    (is (call-it #\# "#") "")
-    (is (call-it #\# "0123456789#") "0123456789")
-    (is (call-it #\# "012345
-6789#") "012345
-6789")))
+             (ngn.dsl::read-before-newline in))))
+    (is (call-it "0123") "0123")
+    (is (call-it "012345
+6789#") "012345")))
 
 
 (subtest "Testing get-level"
@@ -51,7 +65,13 @@
     (is (call-it "[string]s") "string")
 
     (subtest "error case"
-      (is-error (call-it "[") 'error))))
+      (tests-with-syntax-error
+       1 nil "Unexpected NEWLINE while looking for ']'"
+       (call-it "[abc
+abc]"))
+      (tests-with-syntax-error
+       1 nil "Unexpected EOF while looking for ']'"
+       (call-it "[")))))
 
 
 (subtest "Testing element-reader"
@@ -69,7 +89,9 @@
     (is (call-it "ul[str]") "ul-str")
  
     (subtest "error case"
-      (is-error (call-it "aa") 'error))))
+      (tests-with-syntax-error
+        1 nil "'aa' is not ngn-element"
+        (call-it "aa")))))
 
 
 (subtest "Testing sharp-reader"

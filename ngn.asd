@@ -25,8 +25,9 @@
                :unix-options)
   :components ((:module "src"
                 :components
-                ((:file "parser")
-                 (:file "dsl")
+                ((:file "error")
+                 (:file "parser" :depends-on ("error"))
+                 (:file "dsl" :depends-on ("error"))
                  (:file "renderer" :depends-on ("dsl"))
                  (:file "ngn" :depends-on ("parser" "renderer")))))
   :description "novel page generator"
