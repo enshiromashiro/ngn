@@ -26,7 +26,7 @@
 
 
 ;;;; syntax error notification
-(defparameter *line-number* nil)
+(defparameter *line-number* 1)
 (defparameter *tag-name* nil)
 
 (defun init-linum ()
