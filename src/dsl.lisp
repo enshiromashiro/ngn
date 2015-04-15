@@ -55,14 +55,17 @@
                      (syntax-error-message condition)))))
 
 (defun syntax-error (msg)
-  (error (make-condition ngn-syntax-error :msg msg)))
+  (error (make-condition 'ngn-syntax-error :msg msg)))
+
+(defun unexpected-xxx-error (obj char)
+  (syntax-error
+   (format nil "Unexpected ~a while looking for '~a'" obj char)))
+
+(defun unexpected-eof-error (char)
+  (unexpected-xxx-error "EOF" char))
 
 
 ;;;; utilities
-(defun ngn-error (fmt &rest args)
-  (error (apply #'format
-                `(nil ,(format nil "[ngn] ~a" fmt) ,@args))))
-
 (defun read-to (char stream)
   (with-output-to-string (out)
     (loop
@@ -88,15 +91,17 @@
 
 ;;;; sharp reader
 (defun bracket-reader (stream)
-  (if (eq #\[ (peek-char nil stream))
+  (if (eq #\[ (peek-char nil stream nil :eof))
       (with-output-to-string (out)
         (read-char stream)
         (loop
            for c = (read-char stream nil :eof)
-           if (eq c :eof) do (ngn-error "unexpected EOF")
+           when (eq c #\newline) do (unexpected-xxx-error "NEWLINE" #\])
+           when (eq c :eof) do (unexpected-eof-error #\])
            until (eq c #\])
            do (write-char c out)))
-      (ngn-error "\"~a\" is not open-bracket" (peek-char nil stream :eof))))
+      (syntax-error (format nil "'~a' is not '['"
+                            (peek-char nil stream nil "EOF")))))
 
 (defun element-reader (stream)
   (let ((kind (format nil "~a~a" (read-char stream) (read-char stream))))
@@ -112,7 +117,7 @@
            (render-bold-italic (bracket-reader stream)))
           ((string= kind "ul") ; for underline
            (render-underline (bracket-reader stream)))
-          (t (ngn-error "'~a' is not ngn-element" kind)))))
+          (t (syntax-error (format nil "'~a' is not ngn-element" kind))))))
 
 (defun sharp-reader (stream linehead-p)
   (read-char stream)
@@ -148,7 +153,8 @@
                    (and (< 0 level)
                         (<= level +render-quote-level-max+)))
                  (push-line ()
-                   (push (line-reader (read-line stream)) lines))
+                   (push (line-reader (read-line stream)) lines)
+                   (incf-linum))
                  (render-lines ()
                    (render-quote (format nil "~{~a~^~%~}" (nreverse lines))
                                  now-level)))
@@ -189,8 +195,8 @@
     (loop
        for c = (peek-char nil stream nil :eof)
        for linehead? = t then (if prev-newline? t nil)
-       for linum = 1 then (if prev-newline? (1+ linum) linum)
        with prev-newline? = nil
+       when prev-newline? do (incf-linum)
        until (eq c :eof)
        do (setf prev-newline? (eq c #\newline))
          (case c
@@ -219,7 +225,11 @@
   (let ((*package* (find-package :ngn.dsl)))
     (load renderer-path))
   (let ((new-tags (make-hash-table)))
-    (maphash (lambda (k v) (setf (gethash k new-tags) (render-tag v)))
+    (maphash (lambda (k v)
+               (init-linum)
+               (set-tag-name k)
+               (setf (gethash k new-tags) (render-tag v))
+               (init-tag-name))
              tags)
     (when (functionp *render-hook*)
       (funcall *render-hook* new-tags))
