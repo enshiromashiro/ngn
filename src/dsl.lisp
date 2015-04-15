@@ -66,11 +66,11 @@
 
 
 ;;;; utilities
-(defun read-to (char stream)
+(defun read-before-newline ( stream)
   (with-output-to-string (out)
     (loop
        for c = (peek-char nil stream nil :eof)
-       until (or (eq c char) (eq c :eof))
+       until (or (eq c #\newline) (eq c :eof))
        do (write-char (read-char stream) out))))
 
 (defun get-level (char stream)
@@ -127,7 +127,7 @@
              (if (and linehead-p (< lev +render-header-level-max+))
                  (let ((ch (read-char stream)))
                    (if (eq ch #\space)
-                       (render-header (read-to #\newline stream) (1+ lev))
+                       (render-header (read-before-newline stream) (1+ lev))
                        (format nil "#~a~a" str ch)))
                  (format nil "#~a" str))))))
 

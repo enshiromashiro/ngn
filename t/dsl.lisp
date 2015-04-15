@@ -28,17 +28,13 @@
          (is msg-got ,msg)))))
 
 
-(subtest "Testing read-to"
-  (flet ((call-it (ch str)
+(subtest "Testing read-before-newline"
+  (flet ((call-it (str)
            (with-input-from-string (in str)
-             (ngn.dsl::read-to ch in))))
-    (is (call-it #\# "#") "")
-    (is (call-it #\# "0123456789#") "0123456789")
-
-    (is (call-it #\# "0123") "0123")
-    (is (call-it #\# "012345
-6789#") "012345
-6789")))
+             (ngn.dsl::read-before-newline in))))
+    (is (call-it "0123") "0123")
+    (is (call-it "012345
+6789#") "012345")))
 
 
 (subtest "Testing get-level"
