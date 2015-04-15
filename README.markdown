@@ -30,7 +30,7 @@ ngnがどんなものなのかもっと詳しく知りたい場合は[このス�
 
     <html>
     <head>
-    <title>#|title|#<\title>
+    <title>#|title|#</title>
     </head>
     <body>
     <h1>#|title|#</h1>
