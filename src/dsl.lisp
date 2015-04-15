@@ -6,6 +6,14 @@
 (in-package :cl-user)
 (defpackage ngn.dsl
   (:use :cl)
+  (:import-from :ngn.error
+                :init-linum
+                :incf-linum
+                :init-tag-name
+                :set-tag-name
+                :dsl-syntax-error
+                :unexpected-xxx-error
+                :unexpected-eof-error)
   (:export :render-tags))
 (in-package :ngn.dsl)
 
@@ -23,46 +31,6 @@
 
 (defvar +render-header-level-max+ 4)
 (defvar +render-quote-level-max+ 4)
-
-
-;;;; syntax error notification
-(defparameter *line-number* 1)
-(defparameter *tag-name* nil)
-
-(defun init-linum ()
-  (setf *line-number* 1))
-(defun init-tag-name ()
-  (setf *tag-name* nil))
-
-(defun incf-linum ()
-  (incf *line-number*))
-(defun set-tag-name (name)
-  (setf *tag-name* name))
-
-(define-condition ngn-syntax-error (condition)
-  ((linum :initform *line-number*
-          :reader syntax-error-linum)
-   (tagname :initform *tag-name*
-            :reader syntax-error-tagname)
-   (message :initform ""
-            :initarg :msg
-            :reader syntax-error-message))
-  (:report (lambda (condition stream)
-             (format stream
-                     "[ngn]: syntax error at line ~a of \"~a\" tag.~%~a~%"
-                     (syntax-error-linum condition)
-                     (syntax-error-tagname condition)
-                     (syntax-error-message condition)))))
-
-(defun syntax-error (msg)
-  (error (make-condition 'ngn-syntax-error :msg msg)))
-
-(defun unexpected-xxx-error (obj char)
-  (syntax-error
-   (format nil "Unexpected ~a while looking for '~a'" obj char)))
-
-(defun unexpected-eof-error (char)
-  (unexpected-xxx-error "EOF" char))
 
 
 ;;;; utilities
@@ -100,7 +68,7 @@
            when (eq c :eof) do (unexpected-eof-error #\])
            until (eq c #\])
            do (write-char c out)))
-      (syntax-error (format nil "'~a' is not '['"
+      (dsl-syntax-error (format nil "'~a' is not '['"
                             (peek-char nil stream nil "EOF")))))
 
 (defun element-reader (stream)
@@ -117,7 +85,7 @@
            (render-bold-italic (bracket-reader stream)))
           ((string= kind "ul") ; for underline
            (render-underline (bracket-reader stream)))
-          (t (syntax-error (format nil "'~a' is not ngn-element" kind))))))
+          (t (dsl-syntax-error (format nil "'~a' is not ngn-element" kind))))))
 
 (defun sharp-reader (stream linehead-p)
   (read-char stream)

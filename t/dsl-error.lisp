@@ -6,6 +6,7 @@
 (in-package :cl-user)
 (defpackage ngn.dsl-error-test
   (:use :cl
+        :ngn.error
         :ngn.parser
         :prove))
 (in-package :ngn.dsl-error-test)
@@ -16,13 +17,13 @@
 (defmacro tests-with-syntax-error (linum tagname msg &body body)
   `(handler-case
        (progn
-         (ngn.dsl::init-linum)
-         (ngn.dsl::init-tag-name)
+         (init-linum)
+         (init-tag-name)
          ,@body)
-     (ngn.dsl::ngn-syntax-error (c)
-       (let ((linum-got (ngn.dsl::syntax-error-linum c))
-             (tagname-got (ngn.dsl::syntax-error-tagname c))
-             (msg-got (ngn.dsl::syntax-error-message c)))
+     (dsl-syntax-error (c)
+       (let ((linum-got (ngn.error::syntax-error-linum c))
+             (tagname-got (ngn.error::syntax-error-tagname c))
+             (msg-got (ngn.error::syntax-error-message c)))
          (is linum-got ,linum)
          (is tagname-got ,tagname)
          (is msg-got ,msg)))
