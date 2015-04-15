@@ -121,8 +121,7 @@ line4
    1 'text2 "Unexpected EOF while looking for ']'"
    (render-tags 'text1 "title"
                 'text2 "#bd["
-                'text3 "#bd("))
-)
+                'text3 "#bd(")))
     
 
 (finalize)
