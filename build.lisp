@@ -7,18 +7,26 @@
 (defvar *app-name*
   #-windows "ngn"
   #+windows "ngn.exe")
+(defvar *app-toplevel*
+  #'ngn:app)
 
-(defun build-app ()
-  #+sbcl (save-lisp-and-die
-          *app-name*
-          :toplevel #'ngn:app
-          :executable t)
-  #+ccl (save-application
-         *app-name*
-         :toplevel-function #'ngn:app
-         :prepend-kernel t))
-
-
-;; build app
-(build-app)
-
+;;;; building app
+#+sbcl
+(save-lisp-and-die
+ *app-name*
+ :toplevel *app-toplevel*
+ :executable t)
+#+ccl
+(save-application
+ *app-name*
+ :toplevel-function *app-toplevel*
+ :prepend-kernel t)
+#+ecl
+(asdf:make-build
+ :ngn
+ :type :program
+ :move-here "."
+ :monolithic t
+ :epilogue-code '(progn
+                  (ngn:app)
+                  (quit)))
